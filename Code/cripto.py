@@ -55,9 +55,6 @@ class AESCipher(object):
 #     # value = cipher.decrypt(value)
 #     print(cipher.decrypt(value))
 #     return pickle.loads(cipher.decrypt(value))
-######################################
-#########Jorge Martins fc51033########
-######################################
 
 
 def encrypt(key, value):
