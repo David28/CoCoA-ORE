@@ -1,7 +1,3 @@
-######################################
-#########Jorge Martins fc51033########
-######################################
-
 import sys
 from lexer import *
 from tokens import *

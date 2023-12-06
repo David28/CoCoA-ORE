@@ -1,7 +1,3 @@
-######################################
-#########Jorge Martins fc51033########
-######################################
-
 from ast import Assign
 import re
 from lexer import *

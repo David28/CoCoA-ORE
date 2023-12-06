@@ -1,6 +1,3 @@
-######################################
-#########Jorge Martins fc51033########
-######################################
 from cripto import AESCipher, encrypt  # , encrypt_aes
 import re
 from ds import MyValue

@@ -1,7 +1,3 @@
-######################################
-#########Jorge Martins fc51033########
-######################################
-
 from Crypto import Random
 import hashlib
 from hashlib import sha1, md5
@@ -62,17 +58,6 @@ class AESCipher(object):
 ######################################
 #########Jorge Martins fc51033########
 ######################################
-
-from Crypto import Random
-import hashlib
-from hashlib import sha1, md5
-import hmac
-import base64
-from Crypto.Cipher import AES
-from base64 import b64decode
-from base64 import b64encode
-
-from tokens import *
 
 
 def encrypt(key, value):
