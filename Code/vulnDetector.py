@@ -75,7 +75,7 @@ class VulnerabilityDetector(object):
 
             # depth checker
             # for i in range(1, max(len(x) for x in v)):
-            #     for j in range(0, len(v)):
+            #     for j in range(0, len(v)):z
             #         continue
             # find closest path to vulnerability
             for i in range(1, max(len(x) for x in v)):
@@ -86,7 +86,7 @@ class VulnerabilityDetector(object):
                         if not closest:
                             closest = v[j][i]
                             best_match = v[j]
-                        elif v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1]:
+                        elif v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1]: #TODO: Verificar se há maneira de fazer isto usando ORE
                             closest = v[j][i]
                             best_match = v[j]
             # print(closest)
@@ -103,7 +103,7 @@ class VulnerabilityDetector(object):
         for _, i in final.items():
             boolskip = True
             for j in i:
-                if j[2] > 0:
+                if j[2] > 0: #TODO: Com ORE precisa-se de este valor base cifrado
                     for loles in i[2:]:
                         # se ha alguma atribuicao
                         if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:

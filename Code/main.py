@@ -46,10 +46,10 @@ if __name__ == '__main__':
     vd = VulnerabilityDetector(data, "teste")
     print("---VD %s seconds ---" % (time.time() - start_time))
     with open("output.txt", "w") as f:
-        f.write(json.dumps(
-            vd.detection(encrypt(encrypt("teste", "INPUT"), "INPUT"), encrypt(encrypt("teste", "XSS_SENS"), "XSS_SENS"), encrypt(encrypt("teste", "XSS_SANS"), "XSS_SANS"))))
         # f.write(json.dumps(
-        #     vd.detection("INPUT", "XSS_SENS", "XSS_SANS")))
+        #    vd.detection(encrypt(encrypt("teste", "INPUT"), "INPUT"), encrypt(encrypt("teste", "XSS_SENS"), "XSS_SENS"), encrypt(encrypt("teste", "XSS_SANS"), "XSS_SANS"))))
+        f.write(json.dumps(
+            vd.detection("INPUT", "XSS_SENS", "XSS_SANS")))
         f.close()
 
     with open("filesize.txt", "ab") as f:

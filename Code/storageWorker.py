@@ -55,6 +55,7 @@ class Worker(object):
                         while dummie.type != "END_CALL":
                             if not _isOP(curr.type):
                                 if flag:
+                                    #TODO: Esclarecer se isto está correto porque não funciona depois para o search
                                     ###changes####
                                     currkey = encrypt(mykey, curr.type)
                                     curr.type = encrypt(currkey, curr.type)

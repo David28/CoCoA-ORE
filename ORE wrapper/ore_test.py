@@ -33,7 +33,7 @@ for i in range(N_TESTS):
     #print("Test {} passed".format(i))
 
 
-print("All simple tests passed")
+print("Simple test passed")
 
 #test sorting
 ARR_LEN = 100
@@ -46,4 +46,34 @@ zipped.sort()
 enc_arr, arr = zip(*zipped)
 for i in range(ARR_LEN - 1):
     assert arr[i] <= arr[i+1]
-print("All sorting tests passed")
+print("Sorting test passed")
+
+#test serialization
+for i in range(N_TESTS):
+    msg1 = random.randint(0, 2**32 - 1)
+    msg2 = random.randint(0, 2**32 - 1)
+    
+    sk, params = getInitiatedParams()
+    ore_val1 = ore_val(msg1, sk, params)
+    ore_val2 = ore_val(msg2, sk, params)
+    
+    #serialize
+    ser1 = ore_val1._serialize()
+    ser2 = ore_val2._serialize()
+    
+    #deserialize
+    ore_val1 = ore_val._deserialize(ser1)
+    ore_val2 = ore_val._deserialize(ser2)
+    
+    # assertions
+    assert (ore_val1 < ore_val2) == (msg1 < msg2)
+    assert (ore_val1 <= ore_val2) == (msg1 <= msg2)
+    assert (ore_val1 == ore_val2) == (msg1 == msg2)
+    assert (ore_val1 != ore_val2) == (msg1 != msg2)
+    assert (ore_val1 > ore_val2) == (msg1 > msg2)
+    assert (ore_val1 >= ore_val2) == (msg1 >= msg2)
+    
+    #cleanup
+    ore_val1.cleanup()
+    ore_val2.cleanup()
+print("Serialization test passed")
