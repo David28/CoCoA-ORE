@@ -4,7 +4,8 @@ from unittest import result
 from cripto import *  # decrypt_aes
 from matplotlib.pyplot import close
 from ds import *
-flag = False
+import config
+flag = config.flag
 
 
 class VulnerabilityDetector(object):
@@ -100,10 +101,11 @@ class VulnerabilityDetector(object):
         for _, v in final.items():
             myresult.append(v)
         accused = -1
+        base_depth = self.ds.get("BASE_DEPTH")[0]
         for _, i in final.items():
             boolskip = True
             for j in i:
-                if j[2] > 0: #TODO: Com ORE precisa-se de este valor base cifrado
+                if j[2] > base_depth: #TODO: Com ORE precisa-se de este valor base cifrado antes era só 0
                     for loles in i[2:]:
                         # se ha alguma atribuicao
                         if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:

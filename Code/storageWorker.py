@@ -2,9 +2,11 @@ from cripto import AESCipher, encrypt  # , encrypt_aes
 import re
 from ds import MyValue
 import secrets
+from lib.ore_wrapper import getInitiatedParams, ore_val
+import config
 
-flag = False
-
+flag = config.flag
+ore_flag = config.ore_flag
 
 def _isVar(typestr):
     pattern = re.compile(r'VAR[0-9]+')
@@ -38,6 +40,11 @@ class Worker(object):
         self.order = [0]
         self.type = 0
         self.alg = AESCipher(aeskey)
+        if ore_flag:
+            self.ore_params = [getInitiatedParams() for _ in range(3)]
+            self.ds.put("BASE_DEPTH", ore_val(0, self.ore_params[0][0], self.ore_params[0][1]))
+        else:
+            self.ds.put("BASE_DEPTH", 0)
 
     def store(self, depth, mykey):
         if self.next >= len(self.tokenstream):
@@ -65,8 +72,11 @@ class Worker(object):
                                     # curr.type = encrypt(mykey, curr.type)
                                     # dummie.type = encrypt(
                                     #     mykey, dummie.type)
-                                val = MyValue(
-                                    curr.lineno, depth, dummie, self.order[depth], self.type)
+                                if ore_flag:
+                                    val = MyValue(curr.lineno, ore_val(depth, self.ore_params[0][0], self.ore_params[0][1]),dummie, ore_val(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), ore_val(self.type, self.ore_params[2][0], self.ore_params[2][1]))
+                                else:
+                                    val = MyValue(
+                                        curr.lineno, depth, dummie, self.order[depth], self.type)   
                                 if flag:
                                     val = self.alg.encrypt(val._serialize())
                                 self.ds.put(curr.type, val)
@@ -82,7 +92,10 @@ class Worker(object):
                             ########
                             # curr.type = encrypt(mykey, curr.type)
                             # key.type = encrypt(mykey, key.type)
-                        val = MyValue(key.lineno, depth,
+                        if ore_flag:
+                            val = MyValue(key.lineno, ore_val(depth, self.ore_params[0][0], self.ore_params[0][1]),curr, ore_val(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), ore_val(self.type, self.ore_params[2][0], self.ore_params[2][1]))
+                        else:
+                            val = MyValue(key.lineno, depth,
                                       curr, self.order[depth], self.type)
                         if flag:
                             val = self.alg.encrypt(val._serialize())
@@ -104,8 +117,12 @@ class Worker(object):
                             ########
                             # curr.type = encrypt(mykey, curr.type)
                             # key.type = encrypt(mykey, key.type)
-                        val = MyValue(key.lineno, depth,
+                        if ore_flag:
+                            val = MyValue(key.lineno, ore_val(depth, self.ore_params[0][0], self.ore_params[0][1]),curr, ore_val(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), ore_val(self.type, self.ore_params[2][0], self.ore_params[2][1]))
+                        else:
+                            val = MyValue(key.lineno, depth,
                                       curr, self.order[depth], self.type)
+                        
                         if flag:
                             val = self.alg.encrypt(val._serialize())
                         self.ds.put(key.type, val)

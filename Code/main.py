@@ -10,7 +10,7 @@ import yaml
 import json
 import time
 import pickle
-
+import config as cfg
 # Trata de tudo desde o .php até à estrutura de dados
 if __name__ == '__main__':
     start_time = time.time()
@@ -46,12 +46,24 @@ if __name__ == '__main__':
     vd = VulnerabilityDetector(data, "teste")
     print("---VD %s seconds ---" % (time.time() - start_time))
     with open("output.txt", "w") as f:
-        # f.write(json.dumps(
-        #    vd.detection(encrypt(encrypt("teste", "INPUT"), "INPUT"), encrypt(encrypt("teste", "XSS_SENS"), "XSS_SENS"), encrypt(encrypt("teste", "XSS_SANS"), "XSS_SANS"))))
-        f.write(json.dumps(
-            vd.detection("INPUT", "XSS_SENS", "XSS_SANS")))
-        f.close()
+        if (cfg.flag):
+            results = vd.detection(encrypt(encrypt("teste", "INPUT"), "INPUT"), encrypt(encrypt("teste", "XSS_SENS"), "XSS_SENS"), encrypt(encrypt("teste", "XSS_SANS"), "XSS_SANS"))
+        else:
+            results = vd.detection("INPUT", "XSS_SENS", "XSS_SANS")
 
+        for i in range(len(results)):
+           for j in range(len(results[i])):
+               results[i][j] = tuple(str(x) for x in results[i][j])
+        f.write(json.dumps(results))
+        f.close()
+    
+    #have to serialize the data structure because it has pointers
+    for key in data.data:
+        for val in data.data[key]:
+            if (type(val) is MyValue):
+                data.data[key] = val._serialize()
+            elif (type(val) is ore_val):
+                data.data[key] = val._serialize()
     with open("filesize.txt", "ab") as f:
         pickle.dump(data, f)
  #wc -l

@@ -5,11 +5,10 @@ import sys
 import time
 
 # Load the shared library into c types.
-ore = CDLL(os.path.abspath("libore.so"))
+ore = CDLL(os.path.relpath("./lib/libore.so"))
 
 size_of_structs = ore.size_of_structs
 size_of_structs.restype = c_int
-size_of_structs()
 
 # // the public parameters for the encryption scheme, used to compare ciphertexts
 # typedef struct {
@@ -21,7 +20,6 @@ class ore_blk_params(Structure):
     _fields_ = [("initialized", c_bool),
                 ("nbits", c_uint32),
                 ("block_len", c_uint32)]
-print("Size of ore_blk_params: ", sizeof(ore_blk_params))
 # // the secret key for the encryption scheme
 # typedef struct {
 #   bool initialized;         // whether or not the secret key has been initalized
@@ -34,7 +32,6 @@ class ore_blk_secret_key(Structure):
                 ("prf_key", c_uint8 * 264),
                 ("prp_key", c_uint8 * 264),
                 ("params", ore_blk_params)]
-print("Size of ore_blk_secret_key: ", sizeof(ore_blk_secret_key))
 # // the ciphertexts of the encryption scheme
 # typedef struct {
 #   bool initialized;            // whether or not the ciphertext has been initialized
@@ -47,7 +44,6 @@ class ore_blk_ciphertext(Structure):
                 ("comp_left", POINTER(c_uint8)),
                 ("comp_right", POINTER(c_uint8)),
                 ("params", ore_blk_params)]
-print("Size of ore_blk_ciphertext: ", sizeof(ore_blk_ciphertext))
 
 # int init_ore_blk_params(ore_blk_params params, uint32_t nbits, uint32_t block_len);
 init_ore_blk_params = ore.init_ore_blk_params
@@ -93,7 +89,7 @@ ore_blk_ciphertext_size.restype = c_int
 class ore_val():
     def __init__(self, val, sk=None, params=None):
         if sk is None or params is None:
-            #reading a previously encrypted value
+            #reading a previously encrypted value just so its easier to serialize and deserialize
             self.ctxt =  ore_blk_ciphertext()
             convert_bytes_to_structure(self.ctxt, bytes.fromhex(val))
             return
@@ -103,30 +99,23 @@ class ore_val():
 
     #overload operators
     def __lt__(self, other):
-        result = c_int32()
-        ore_blk_compare(byref(result), pointer(self.ctxt), pointer(other.ctxt))
-        return result.value == -1
+        return self.compare(other) == -1
     def __le__(self, other):
-        result = c_int32()
-        ore_blk_compare(byref(result), pointer(self.ctxt), pointer(other.ctxt))
-        return result.value <= 0
+        return self.compare(other) <= 0
     def __eq__(self, other):
-        result = c_int32()
-        ore_blk_compare(byref(result), pointer(self.ctxt), pointer(other.ctxt))
-        return result.value == 0
+        return self.compare(other) == 0
     def __ne__(self, other):
-        result = c_int32()
-        ore_blk_compare(byref(result), pointer(self.ctxt), pointer(other.ctxt))
-        return result.value != 0
+        return self.compare(other) != 0
     def __gt__(self, other):
-        result = c_int32()
-        ore_blk_compare(byref(result), pointer(self.ctxt), pointer(other.ctxt))
-        return result.value == 1
+        return self.compare(other) == 1
     def __ge__(self, other):
+        return self.compare(other) >= 0
+    
+    def compare(self, other):
         result = c_int32()
         ore_blk_compare(byref(result), pointer(self.ctxt), pointer(other.ctxt))
-        return result.value >= 0
-    
+        return result.value
+
     def cleanup(self):
         clear_ore_blk_ciphertext(pointer(self.ctxt))
 
@@ -157,6 +146,13 @@ def getInitiatedParams():
     ore_blk_setup(pointer(sk), pointer(params))
     return sk, params
 
+def debugSizes():
+    size_of_structs()
+    print("Size of ore_blk_params: ", sizeof(ore_blk_params))
+    print("Size of ore_blk_ciphertext: ", sizeof(ore_blk_ciphertext))
+    print("Size of ore_blk_secret_key: ", sizeof(ore_blk_secret_key))
+
+
 
 #https://gist.github.com/lmyyao/355709b35b717c9e47c6795de7b45ccd
 def convert_bytes_to_structure(st, byte):
@@ -172,3 +168,4 @@ def convert_struct_to_bytes(st):
 
 def conver_int_to_bytes(number, size):
     return (number).to_bytes(size, 'big')
+
