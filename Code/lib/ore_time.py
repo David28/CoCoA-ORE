@@ -12,8 +12,8 @@ def test_ore(msg1, msg2):
     # setup
     sk, params = getInitiatedParams()
     
-    ore_val1 = ore_val(msg1, sk, params)
-    ore_val2 = ore_val(msg2, sk, params)
+    ore_val1 = OreVal(msg1, sk, params)
+    ore_val2 = OreVal(msg2, sk, params)
     # assertions
     less_than = ore_val1 < ore_val2
     
@@ -57,7 +57,7 @@ print("Normal sorting time for {} values: {}".format(N_TESTS, normal_sort_time))
 print(bold,"Timing ORE comparisons with sorting",bold_end)
 start = time.time()
 sk, params = getInitiatedParams()
-enc_arr = [ore_val(msg, sk, params) for msg in arr]
+enc_arr = [OreVal(msg, sk, params) for msg in arr]
 enc_arr.sort()
 end = time.time()
 ore_sort_time = end - start

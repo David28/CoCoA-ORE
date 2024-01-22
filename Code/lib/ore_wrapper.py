@@ -86,7 +86,7 @@ ore_blk_ciphertext_size.argtypes = [POINTER(ore_blk_params)]
 ore_blk_ciphertext_size.restype = c_int
 
 #encrypted comparison with ore
-class ore_val():
+class OreVal():
     def __init__(self, val, sk=None, params=None):
         if sk is None or params is None:
             #reading a previously encrypted value just so its easier to serialize and deserialize
@@ -129,7 +129,7 @@ class ore_val():
     
     @classmethod
     def _deserialize(self, text):
-        return ore_val(text)
+        return OreVal(text)
 
     #make the ore_val hashable
     def __hash__(self):

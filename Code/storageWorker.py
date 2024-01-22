@@ -2,7 +2,7 @@ from cripto import AESCipher, encrypt  # , encrypt_aes
 import re
 from ds import MyValue
 import secrets
-from lib.ore_wrapper import getInitiatedParams, ore_val
+from lib.ore_wrapper import getInitiatedParams, OreVal
 import config
 
 flag = config.flag
@@ -42,7 +42,7 @@ class Worker(object):
         self.alg = AESCipher(aeskey)
         if ore_flag:
             self.ore_params = [getInitiatedParams() for _ in range(3)]
-            self.ds.put("BASE_DEPTH", ore_val(0, self.ore_params[0][0], self.ore_params[0][1]))
+            self.ds.put("BASE_DEPTH", OreVal(0, self.ore_params[0][0], self.ore_params[0][1]))
         else:
             self.ds.put("BASE_DEPTH", 0)
 
@@ -73,7 +73,7 @@ class Worker(object):
                                     # dummie.type = encrypt(
                                     #     mykey, dummie.type)
                                 if ore_flag:
-                                    val = MyValue(curr.lineno, ore_val(depth, self.ore_params[0][0], self.ore_params[0][1]),dummie, ore_val(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), ore_val(self.type, self.ore_params[2][0], self.ore_params[2][1]))
+                                    val = MyValue(curr.lineno, OreVal(depth, self.ore_params[0][0], self.ore_params[0][1]),dummie, OreVal(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), OreVal(self.type, self.ore_params[2][0], self.ore_params[2][1]))
                                 else:
                                     val = MyValue(
                                         curr.lineno, depth, dummie, self.order[depth], self.type)   
@@ -93,7 +93,7 @@ class Worker(object):
                             # curr.type = encrypt(mykey, curr.type)
                             # key.type = encrypt(mykey, key.type)
                         if ore_flag:
-                            val = MyValue(key.lineno, ore_val(depth, self.ore_params[0][0], self.ore_params[0][1]),curr, ore_val(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), ore_val(self.type, self.ore_params[2][0], self.ore_params[2][1]))
+                            val = MyValue(key.lineno, OreVal(depth, self.ore_params[0][0], self.ore_params[0][1]),curr, OreVal(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), OreVal(self.type, self.ore_params[2][0], self.ore_params[2][1]))
                         else:
                             val = MyValue(key.lineno, depth,
                                       curr, self.order[depth], self.type)
@@ -118,7 +118,7 @@ class Worker(object):
                             # curr.type = encrypt(mykey, curr.type)
                             # key.type = encrypt(mykey, key.type)
                         if ore_flag:
-                            val = MyValue(key.lineno, ore_val(depth, self.ore_params[0][0], self.ore_params[0][1]),curr, ore_val(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), ore_val(self.type, self.ore_params[2][0], self.ore_params[2][1]))
+                            val = MyValue(key.lineno, OreVal(depth, self.ore_params[0][0], self.ore_params[0][1]),curr, OreVal(self.order[depth], self.ore_params[1][0], self.ore_params[1][1]), OreVal(self.type, self.ore_params[2][0], self.ore_params[2][1]))
                         else:
                             val = MyValue(key.lineno, depth,
                                       curr, self.order[depth], self.type)

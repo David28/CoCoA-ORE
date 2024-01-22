@@ -1,2 +1,2 @@
-flag = False #flag to enable encryption
-ore_flag = True #flag to enable ORE
+flag = True #flag to enable encryption
+ore_flag = False #flag to enable ORE

@@ -62,7 +62,7 @@ if __name__ == '__main__':
         for val in data.data[key]:
             if (type(val) is MyValue):
                 data.data[key] = val._serialize()
-            elif (type(val) is ore_val):
+            elif (type(val) is OreVal):
                 data.data[key] = val._serialize()
     with open("filesize.txt", "ab") as f:
         pickle.dump(data, f)

@@ -1,4 +1,4 @@
-from lib.ore_wrapper import ore_val
+from lib.ore_wrapper import OreVal
 from tokens import *
 
 
@@ -31,13 +31,13 @@ class MyValue(object):
 
     def _serialize(self):
         #have to indicate if we are using ore or not
-        return ("ore;;" if isinstance(self.flowinfo, ore_val) else "") + str(self.lineno) + ";;" + str(self.flowinfo) + ";;" + self.token.type + ";;" + str(self.token.lineno) + ";;" + str(self.order) + ";;" + str(self.type)
+        return ("ore;;" if isinstance(self.flowinfo, OreVal) else "") + str(self.lineno) + ";;" + str(self.flowinfo) + ";;" + self.token.type + ";;" + str(self.token.lineno) + ";;" + str(self.order) + ";;" + str(self.type)
 
     @classmethod
     def _deserialize(self, text):
         a = text.split(";;")
         if a[0] == "ore":
-            return MyValue(int(a[1]), ore_val(a[2]), MyToken(a[3], int(a[4])), ore_val(a[5]), ore_val(a[6]))
+            return MyValue(int(a[1]), OreVal(a[2]), MyToken(a[3], int(a[4])), OreVal(a[5]), OreVal(a[6]))
         else:
             return MyValue(int(a[0]), int(a[1]), MyToken(a[2], int(a[3])), int(a[4]), int(a[5]))
 # PASSOU DE {KEY: {LINE: TOK}} PARA {KEY: [OBJ(LINE, DEPTH, TOK)]}
