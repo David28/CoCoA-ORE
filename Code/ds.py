@@ -3,13 +3,21 @@ from tokens import *
 
 
 class MyValue(object):
-    def __init__(self, lineno, flowinfo, token, order, type):
+    def __init__(self, lineno, flowinfo, token, order, type, ore_params=None):
         self.lineno = lineno
         self.flowinfo = flowinfo
         self.token = token
         self.order = order
         self.type = type
-        # ordem
+        # Order Revealing Encryption
+        if ore_params:
+            self.lineno = OreVal(lineno, ore_params[0][0], ore_params[0][1])
+            self.token = MyToken(token.type, OreVal(token.lineno, ore_params[0][0], ore_params[0][1]))
+
+            self.flowinfo = OreVal(flowinfo, ore_params[1][0], ore_params[1][1])
+            self.order = OreVal(order, ore_params[2][0], ore_params[2][1])
+            self.type = OreVal(type, ore_params[3][0], ore_params[3][1])
+            
 
     def get_line(self):
         return self.lineno

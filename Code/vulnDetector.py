@@ -87,11 +87,11 @@ class VulnerabilityDetector(object):
                         if not closest:
                             closest = v[j][i]
                             best_match = v[j]
-                        elif v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1]: #TODO: Verificar se há maneira de fazer isto usando ORE
+                        elif v[j][i][1] > closest[1]: #TODO: Confirmar se v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1] <=> v[j][i][1] > closest[1]
                             closest = v[j][i]
                             best_match = v[j]
-            # print(closest)
-            # print(best_match)
+            #print(closest)
+            #print(best_match)
             # print("_______________________")
             if best_match[0] in final:
                 final[best_match[0]].append(best_match)
