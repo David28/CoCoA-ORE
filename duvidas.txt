@@ -1,9 +1,0 @@
-Quando o código corre cifrado usando o searchable encryption, não aparece output.
-
-Para encontrar vulnerabilidades é necessário saber a distância entre line numbers. 
-A menos que o algoritmo mude não sei se se pode usar ORE pois não revela a distância.
-
-A depth base é necessária para encontrar vulnerabilidades, acho que não há mais formas de atacar se 
-a depth base de 0 for passada com ore.
-
-Usar FastOre só é possivel em Linux devido ás dependencias.
