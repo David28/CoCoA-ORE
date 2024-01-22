@@ -116,7 +116,7 @@ class VulnerabilityDetector(object):
                         for verify in atual:
                             allzero = True
                             for token in verify:
-                                if token[2] != 0:
+                                if token[2] != base_depth:
                                     allzero = False
                                     break
                             if allzero:

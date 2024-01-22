@@ -131,9 +131,14 @@ class OreVal():
     def _deserialize(self, text):
         return OreVal(text)
 
-    #make the ore_val hashable
     def __hash__(self):
         return hash(str(self))
+    
+    def __repr__(self):
+        return str(self)
+    
+    def __del__(self):
+        self.cleanup()
 
 def getInitiatedParams():
     nbits = 32
