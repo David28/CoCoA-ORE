@@ -136,9 +136,7 @@ class OreVal():
     
     def __repr__(self):
         return str(self)
-    
-    def __del__(self):
-        self.cleanup()
+
 
 def getInitiatedParams():
     nbits = 32

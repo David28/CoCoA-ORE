@@ -45,7 +45,7 @@ class MyValue(object):
     def _deserialize(self, text):
         a = text.split(";;")
         if a[0] == "ore":
-            return MyValue(int(a[1]), OreVal(a[2]), MyToken(a[3], int(a[4])), OreVal(a[5]), OreVal(a[6]))
+            return MyValue(OreVal(a[1]), OreVal(a[2]), MyToken(a[3], OreVal(a[4])), OreVal(a[5]), OreVal(a[6]))
         else:
             return MyValue(int(a[0]), int(a[1]), MyToken(a[2], int(a[3])), int(a[4]), int(a[5]))
 # PASSOU DE {KEY: {LINE: TOK}} PARA {KEY: [OBJ(LINE, DEPTH, TOK)]}
