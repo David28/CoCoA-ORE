@@ -11,6 +11,10 @@ import json
 import time
 import pickle
 import config as cfg
+
+Kd_key = "teste" #Deterministic master key
+Kr_key = "teste2" #Random master key
+
 # Trata de tudo desde o .php até à estrutura de dados
 if __name__ == '__main__':
     start_time = time.time()
@@ -28,7 +32,7 @@ if __name__ == '__main__':
         if not tok:
             break      # No more input
         lextokens.append(tok)
-        # print(tok)
+        #print(tok)
    # print("---Lexer %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     # lextoken stream ==> intermediate language
@@ -38,16 +42,17 @@ if __name__ == '__main__':
     start_time = time.time()
     # intermediate ==> data structure
     data = DataStructure()
-    wrk = Worker(data, intermediate, "teste")
-    wrk.store(0, "teste")
+    wrk = Worker(data, intermediate, Kr_key)
+    wrk.store(0, Kd_key, Kr_key)
     # print(data.data)
     #print("---Encryptor %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
-    vd = VulnerabilityDetector(data, "teste")
+    vd = VulnerabilityDetector(data, Kd_key)
     #print("---VD %s seconds ---" % (time.time() - start_time))
     with open("output.txt", "w") as f:
         if (cfg.flag):
-            results = vd.detection(encrypt(encrypt("teste", "INPUT"), "INPUT"), encrypt(encrypt("teste", "XSS_SENS"), "XSS_SENS"), encrypt(encrypt("teste", "XSS_SANS"), "XSS_SANS"))
+            rnd_key = encrypt(Kr_key, "XSS_SENS")
+            results = vd.detection(encrypt(Kd_key,"INPUT"),encrypt(Kd_key,"XSS_SENS"), encrypt(Kd_key,"XSS_SANS"), rnd_key)
         else:
             results = vd.detection("INPUT", "XSS_SENS", "XSS_SANS")
 

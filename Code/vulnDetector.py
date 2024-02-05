@@ -16,6 +16,54 @@ class VulnerabilityDetector(object):
         self.path = []
         self.visited = []
         self.alg = AESCipher(aeskey)
+        #check if any entry has more than one value
+        for k, v in self.ds.data.items():
+            if len(v) > 1:
+                print("Warning: Multiple values for key " + k)
+
+    #depth first search sse
+    def sse_search(self,end, start, cur_rndkey, line=None, flow=0, order=0, type=0):
+        if line:
+            self.path.append((start, line, flow, order, type))
+
+        counter = 1
+        key_ind = encrypt(start,str(counter))
+        if key_ind not in self.ds.data or start == end:
+            self.output.append(copy(self.path))
+            return
+        counter = 1
+        while True:
+            
+            key_ind = encrypt(start,str(counter))
+            if key_ind not in self.ds.data:
+                break
+            val = self.ds.data[key_ind][0]
+            val_ind = AESCipher(cur_rndkey).decrypt(val)
+            val_ind = MyEncryptedValue._deserialize(val_ind)
+
+            currLine = val_ind.get_line()
+            currFlow = val_ind.get_flow()
+            currOrder = val_ind.get_order()
+            currType = val_ind.get_type()
+            currToken = val_ind.get_det_key()
+            currRndKey = val_ind.get_rnd_key()
+
+            if currToken not in self.visited:
+                self.visited.append(currToken)
+                if not line:
+                    self.path = [None]
+                    self.path[0] = (start, currLine, currFlow,
+                                    currOrder, currType)
+                self.sse_search(end, currToken.type,currRndKey,
+                            currToken.lineno, currFlow, currOrder, currType)
+                self.path.pop()
+                self.visited.remove(currToken)
+            counter += 1
+        return
+
+
+        
+
 
     def search(self, end, start, line=None, flow=0, order=0, type=0):
         if line:
@@ -27,8 +75,6 @@ class VulnerabilityDetector(object):
 
         val = self.ds.data[start]
         for v in val:
-            if flag:
-                v = MyValue._deserialize(self.alg.decrypt(v))
             currToken = v.get_token()
             currLine = v.get_line()
             currFlow = v.get_flow()
@@ -45,8 +91,12 @@ class VulnerabilityDetector(object):
                 self.path.pop()
                 self.visited.remove(currToken)
 
-    def detection(self, start, end, sans):
-        self.search(start, end, 0)
+    def detection(self,start, end, sans, init_rnd_key = None):
+        if init_rnd_key:
+            self.sse_search( start,end, init_rnd_key)
+        else:
+            self.search(start, end)
+        
         # operations over output
         final = {}
         group_by_vulns = {}

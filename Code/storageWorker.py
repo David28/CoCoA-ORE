@@ -1,7 +1,7 @@
 from tokens import MyToken
 from cripto import AESCipher, encrypt  # , encrypt_aes
 import re
-from ds import MyValue
+from ds import MyValue, MyEncryptedValue
 import secrets
 from lib.ore_wrapper import getInitiatedParams, OreVal
 import config
@@ -35,8 +35,11 @@ def _isSens(tok):
 
 class Worker(object):
     def __init__(self, ds, tokenstream, aeskey):
+        print("Worker")
         self.ds = ds
         self.tokenstream = tokenstream
+        self.counter = {}    
+        
         self.next = 0
         self.order = [0]
         self.type = 0
@@ -48,7 +51,7 @@ class Worker(object):
             self.ds.put("BASE_DEPTH", 0)
             self.ore_params = None
 
-    def store(self, depth, mykey):
+    def store(self, depth, Kd_key=None, Kr_key=None):
         if self.next >= len(self.tokenstream):
             return
         else:
@@ -63,46 +66,12 @@ class Worker(object):
                         dummie = self.tokenstream[self.next]
                         while dummie.type != "END_CALL":
                             if not _isOP(curr.type):
-                                currtype = curr.type
-                                dummietype = dummie.type
-                                if flag:
-                                    #TODO: Esclarecer se isto está correto porque não funciona depois para o search
-                                    ###changes####
-                                    currkey = encrypt(mykey, curr.type)
-                                    currtype = encrypt(currkey, curr.type)
-                                    currkey = encrypt(mykey, dummie.type)
-                                    dummietype= encrypt(currkey, dummie.type)
-                                    ############
-                                    # curr.type = encrypt(mykey, curr.type)
-                                    # dummie.type = encrypt(
-                                    #     mykey, dummie.type)
-                                val = MyValue(
-                                    curr.lineno, depth, MyToken(dummietype,dummie.lineno), self.order[depth], self.type, self.ore_params)   
-                                if flag:
-                                    val = self.alg.encrypt(val._serialize())
-                                self.ds.put(currtype, val)
+                                self.create_entry(Kd_key,Kr_key, curr, dummie, curr.lineno, depth, self.order[depth], self.type, self.ore_params)
                             self.next += 1
                             dummie = self.tokenstream[self.next]
                     if not _isOP(curr.type):
-                        #Changed so the same reference isn't encrypted mutliple times
-                        #which would make the search fail
-                        keytype = key.type
-                        currtype = curr.type
-                        if flag:
-                            ########
-                            currkey = encrypt(mykey, curr.type)
-                            currtype = encrypt(currkey, curr.type)
-                            currkey = encrypt(mykey, key.type)
-                            keytype = encrypt(currkey, key.type)
-                            ########
-                            # curr.type = encrypt(mykey, curr.type)
-                            # key.type = encrypt(mykey, key.type)
+                        self.create_entry(Kd_key,Kr_key, key,curr, key.lineno, depth, self.order[depth], self.type, self.ore_params)
                         
-                        val = MyValue(key.lineno, depth,
-                                    MyToken(currtype, curr.lineno), self.order[depth], self.type, self.ore_params)
-                        if flag:
-                            val = self.alg.encrypt(val._serialize())
-                        self.ds.put(keytype, val)
                     self.next += 1
                     curr = self.tokenstream[self.next]
             elif curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
@@ -111,24 +80,8 @@ class Worker(object):
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_CALL":
                     if not _isOP(curr.type):
-                        keytype = key.type
-                        currtype = curr.type
-                        if flag:
-                            ########
-                            currkey = encrypt(mykey, curr.type)
-                            currtype = encrypt(currkey, curr.type)
-                            currkey = encrypt(mykey, key.type)
-                            keytype = encrypt(currkey, key.type)
-                            ########
-                            # curr.type = encrypt(mykey, curr.type)
-                            # key.type = encrypt(mykey, key.type)
-
-                        val = MyValue(key.lineno, depth,
-                                    MyToken(currtype, curr.lineno), self.order[depth], self.type, self.ore_params)
+                        self.create_entry(Kd_key,Kr_key, key,curr, key.lineno, depth, self.order[depth], self.type, self.ore_params)
                         
-                        if flag:
-                            val = self.alg.encrypt(val._serialize())
-                        self.ds.put(keytype, val)
                     self.next += 1
                     curr = self.tokenstream[self.next]
             elif curr.type == "ELSEIF" or curr.type == "CASE":
@@ -139,7 +92,7 @@ class Worker(object):
                 self.next += 1
                 aux = self.type
                 self.type += 1  # TODO
-                self.store(depth+1, mykey)
+                self.store(depth+1, Kd_key, Kr_key)
                 self.type = aux
             elif curr.type == "IF":
                 next = self.tokenstream[self.next+1]
@@ -153,15 +106,42 @@ class Worker(object):
                     self.order[depth+1] = self.order[depth+1]+1
                 aux = self.type
                 self.type = 1  # TODO
-                self.store(depth+1, mykey)
+                self.store(depth+1, Kd_key, Kr_key)
                 self.type = aux
             elif curr.type == "ELSE":
                 self.next += 1
                 aux = self.type
                 self.type = -1  # TODO
-                self.store(depth+1, mykey)
+                self.store(depth+1, Kd_key, Kr_key)
                 self.type = aux
             elif curr.type == "ENDIF" or curr.type == "ENDELSE" or curr.type == "ENDELSEIF" or curr.type == "ENDCASE":
                 return
         self.next += 1
-        self.store(depth, mykey)
+        self.store(depth, Kd_key, Kr_key)
+
+    #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
+    def create_entry(self, Kd_key, Kr_key, key_ind, val_ind, lineno, depth, order, type, ore_params):
+        if flag:
+            lineno = val_ind.lineno
+
+            key_ind = key_ind.type
+            val_ind = val_ind.type 
+            self.counter[key_ind] = self.counter.get(key_ind, 0) + 1
+            
+            #cryptographic keys
+            key_detkey = encrypt(Kd_key, key_ind)
+            key_rndkey = encrypt(Kr_key,key_ind)
+            val_detkey = encrypt(Kd_key, val_ind)
+            
+            
+            val_rndkey = encrypt(Kr_key,val_ind)            
+
+            val_ind = MyEncryptedValue(MyToken(val_detkey,lineno), val_rndkey, lineno, depth, order, type, ore_params)
+            val_ind = AESCipher(key_rndkey).encrypt(val_ind._serialize())
+            key_ind = encrypt(key_detkey, str(self.counter[key_ind]))
+        else:
+            val_ind = MyValue(
+            key_ind.lineno, depth, MyToken(val_ind.type,val_ind.lineno), self.order[depth], self.type)
+            key_ind = key_ind.type
+        
+        self.ds.put(key_ind, val_ind)
