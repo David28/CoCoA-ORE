@@ -1,3 +1,4 @@
+from tokens import MyToken
 from cripto import AESCipher, encrypt  # , encrypt_aes
 import re
 from ds import MyValue
@@ -62,40 +63,46 @@ class Worker(object):
                         dummie = self.tokenstream[self.next]
                         while dummie.type != "END_CALL":
                             if not _isOP(curr.type):
+                                currtype = curr.type
+                                dummietype = dummie.type
                                 if flag:
                                     #TODO: Esclarecer se isto está correto porque não funciona depois para o search
                                     ###changes####
                                     currkey = encrypt(mykey, curr.type)
-                                    curr.type = encrypt(currkey, curr.type)
+                                    currtype = encrypt(currkey, curr.type)
                                     currkey = encrypt(mykey, dummie.type)
-                                    dummie.type = encrypt(mykey, dummie.type)
+                                    dummietype= encrypt(currkey, dummie.type)
                                     ############
                                     # curr.type = encrypt(mykey, curr.type)
                                     # dummie.type = encrypt(
                                     #     mykey, dummie.type)
                                 val = MyValue(
-                                    curr.lineno, depth, dummie, self.order[depth], self.type, self.ore_params)   
+                                    curr.lineno, depth, MyToken(dummietype,dummie.lineno), self.order[depth], self.type, self.ore_params)   
                                 if flag:
                                     val = self.alg.encrypt(val._serialize())
-                                self.ds.put(curr.type, val)
+                                self.ds.put(currtype, val)
                             self.next += 1
                             dummie = self.tokenstream[self.next]
                     if not _isOP(curr.type):
+                        #Changed so the same reference isn't encrypted mutliple times
+                        #which would make the search fail
+                        keytype = key.type
+                        currtype = curr.type
                         if flag:
                             ########
                             currkey = encrypt(mykey, curr.type)
-                            curr.type = encrypt(currkey, curr.type)
+                            currtype = encrypt(currkey, curr.type)
                             currkey = encrypt(mykey, key.type)
-                            key.type = encrypt(currkey, key.type)
+                            keytype = encrypt(currkey, key.type)
                             ########
                             # curr.type = encrypt(mykey, curr.type)
                             # key.type = encrypt(mykey, key.type)
                         
                         val = MyValue(key.lineno, depth,
-                                    curr, self.order[depth], self.type, self.ore_params)
+                                    MyToken(currtype, curr.lineno), self.order[depth], self.type, self.ore_params)
                         if flag:
                             val = self.alg.encrypt(val._serialize())
-                        self.ds.put(key.type, val)
+                        self.ds.put(keytype, val)
                     self.next += 1
                     curr = self.tokenstream[self.next]
             elif curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
@@ -104,22 +111,24 @@ class Worker(object):
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_CALL":
                     if not _isOP(curr.type):
+                        keytype = key.type
+                        currtype = curr.type
                         if flag:
                             ########
                             currkey = encrypt(mykey, curr.type)
-                            curr.type = encrypt(currkey, curr.type)
+                            currtype = encrypt(currkey, curr.type)
                             currkey = encrypt(mykey, key.type)
-                            key.type = encrypt(currkey, key.type)
+                            keytype = encrypt(currkey, key.type)
                             ########
                             # curr.type = encrypt(mykey, curr.type)
                             # key.type = encrypt(mykey, key.type)
 
                         val = MyValue(key.lineno, depth,
-                                    curr, self.order[depth], self.type, self.ore_params)
+                                    MyToken(currtype, curr.lineno), self.order[depth], self.type, self.ore_params)
                         
                         if flag:
                             val = self.alg.encrypt(val._serialize())
-                        self.ds.put(key.type, val)
+                        self.ds.put(keytype, val)
                     self.next += 1
                     curr = self.tokenstream[self.next]
             elif curr.type == "ELSEIF" or curr.type == "CASE":

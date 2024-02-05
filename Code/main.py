@@ -29,22 +29,22 @@ if __name__ == '__main__':
             break      # No more input
         lextokens.append(tok)
         # print(tok)
-    print("---Lexer %s seconds ---" % (time.time() - start_time))
+   # print("---Lexer %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     # lextoken stream ==> intermediate language
     intermediate = translator.translate(lextokens)
     #print(*intermediate, sep='\n')
-    print("---Translator %s seconds ---" % (time.time() - start_time))
+    #print("---Translator %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     # intermediate ==> data structure
     data = DataStructure()
     wrk = Worker(data, intermediate, "teste")
     wrk.store(0, "teste")
     # print(data.data)
-    print("---Encryptor %s seconds ---" % (time.time() - start_time))
+    #print("---Encryptor %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     vd = VulnerabilityDetector(data, "teste")
-    print("---VD %s seconds ---" % (time.time() - start_time))
+    #print("---VD %s seconds ---" % (time.time() - start_time))
     with open("output.txt", "w") as f:
         if (cfg.flag):
             results = vd.detection(encrypt(encrypt("teste", "INPUT"), "INPUT"), encrypt(encrypt("teste", "XSS_SENS"), "XSS_SENS"), encrypt(encrypt("teste", "XSS_SANS"), "XSS_SANS"))

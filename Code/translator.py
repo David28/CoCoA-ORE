@@ -78,7 +78,7 @@ class Translator(object):
 
         while i < len(lextokens):
             tok = lextokens[i]
-            print(tok)
+            #print(tok)
             # ignorar parametros passados numa entrypoint
             if tok.type == "INPUT" and lextokens[i+1].type == "LPAREN":
                 del lextokens[i+1]
