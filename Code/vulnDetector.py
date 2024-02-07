@@ -4,8 +4,6 @@ from unittest import result
 from cripto import *  # decrypt_aes
 from matplotlib.pyplot import close
 from ds import *
-import config
-flag = config.flag
 
 
 class VulnerabilityDetector(object):
@@ -17,9 +15,9 @@ class VulnerabilityDetector(object):
         self.visited = []
         self.alg = AESCipher(aeskey)
         #check if any entry has more than one value
-        for k, v in self.ds.data.items():
-            if len(v) > 1:
-                print("Warning: Multiple values for key " + k)
+        # for k, v in self.ds.data.items():
+        #     if len(v) > 1:
+        #         print("Warning: Multiple values for key " + k)
 
     #depth first search sse
     def sse_search(self,end, start, cur_rndkey, line=None, flow=0, order=0, type=0):

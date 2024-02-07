@@ -3,11 +3,8 @@ from cripto import AESCipher, encrypt  # , encrypt_aes
 import re
 from ds import MyValue, MyEncryptedValue
 import secrets
-from lib.ore_wrapper import getInitiatedParams, OreVal
-import config
+from lib.ore_wrapper import OreVal
 
-flag = config.flag
-ore_flag = config.ore_flag
 
 def _isVar(typestr):
     pattern = re.compile(r'VAR[0-9]+')
@@ -34,8 +31,7 @@ def _isSens(tok):
 
 
 class Worker(object):
-    def __init__(self, ds, tokenstream, aeskey):
-        print("Worker")
+    def __init__(self, ds, tokenstream, kd_key=None, kr_key=None, ore_params=None):
         self.ds = ds
         self.tokenstream = tokenstream
         self.counter = {}    
@@ -43,15 +39,15 @@ class Worker(object):
         self.next = 0
         self.order = [0]
         self.type = 0
-        self.alg = AESCipher(aeskey)
-        if ore_flag:
-            self.ore_params = [getInitiatedParams() for _ in range(4)]
+        self.ore_params = ore_params
+        self.kd_key = kd_key
+        self.kr_key = kr_key
+        if self.ore_params:
             self.ds.put("BASE_DEPTH", OreVal(0, self.ore_params[1][0], self.ore_params[1][1]))
         else:
             self.ds.put("BASE_DEPTH", 0)
-            self.ore_params = None
 
-    def store(self, depth, Kd_key=None, Kr_key=None):
+    def store(self, depth):
         if self.next >= len(self.tokenstream):
             return
         else:
@@ -66,11 +62,11 @@ class Worker(object):
                         dummie = self.tokenstream[self.next]
                         while dummie.type != "END_CALL":
                             if not _isOP(curr.type):
-                                self.create_entry(Kd_key,Kr_key, curr, dummie, curr.lineno, depth, self.order[depth], self.type, self.ore_params)
+                                self.create_entry(curr, dummie, curr.lineno, depth, self.order[depth], self.type)
                             self.next += 1
                             dummie = self.tokenstream[self.next]
                     if not _isOP(curr.type):
-                        self.create_entry(Kd_key,Kr_key, key,curr, key.lineno, depth, self.order[depth], self.type, self.ore_params)
+                        self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
                         
                     self.next += 1
                     curr = self.tokenstream[self.next]
@@ -80,7 +76,7 @@ class Worker(object):
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_CALL":
                     if not _isOP(curr.type):
-                        self.create_entry(Kd_key,Kr_key, key,curr, key.lineno, depth, self.order[depth], self.type, self.ore_params)
+                        self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
                         
                     self.next += 1
                     curr = self.tokenstream[self.next]
@@ -92,7 +88,7 @@ class Worker(object):
                 self.next += 1
                 aux = self.type
                 self.type += 1  # TODO
-                self.store(depth+1, Kd_key, Kr_key)
+                self.store(depth+1)
                 self.type = aux
             elif curr.type == "IF":
                 next = self.tokenstream[self.next+1]
@@ -106,22 +102,22 @@ class Worker(object):
                     self.order[depth+1] = self.order[depth+1]+1
                 aux = self.type
                 self.type = 1  # TODO
-                self.store(depth+1, Kd_key, Kr_key)
+                self.store(depth+1)
                 self.type = aux
             elif curr.type == "ELSE":
                 self.next += 1
                 aux = self.type
                 self.type = -1  # TODO
-                self.store(depth+1, Kd_key, Kr_key)
+                self.store(depth+1)
                 self.type = aux
             elif curr.type == "ENDIF" or curr.type == "ENDELSE" or curr.type == "ENDELSEIF" or curr.type == "ENDCASE":
                 return
         self.next += 1
-        self.store(depth, Kd_key, Kr_key)
+        self.store(depth)
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
-    def create_entry(self, Kd_key, Kr_key, key_ind, val_ind, lineno, depth, order, type, ore_params):
-        if flag:
+    def create_entry(self, key_ind, val_ind, lineno, depth, order, type):
+        if self.kd_key and self.kr_key:
             lineno = val_ind.lineno
 
             key_ind = key_ind.type
@@ -129,14 +125,14 @@ class Worker(object):
             self.counter[key_ind] = self.counter.get(key_ind, 0) + 1
             
             #cryptographic keys
-            key_detkey = encrypt(Kd_key, key_ind)
-            key_rndkey = encrypt(Kr_key,key_ind)
-            val_detkey = encrypt(Kd_key, val_ind)
+            key_detkey = encrypt(self.kd_key, key_ind)
+            key_rndkey = encrypt(self.kr_key,key_ind)
+            val_detkey = encrypt(self.kd_key, val_ind)
             
             
-            val_rndkey = encrypt(Kr_key,val_ind)            
+            val_rndkey = encrypt(self.kr_key,val_ind)            
 
-            val_ind = MyEncryptedValue(MyToken(val_detkey,lineno), val_rndkey, lineno, depth, order, type, ore_params)
+            val_ind = MyEncryptedValue(MyToken(val_detkey,lineno), val_rndkey, lineno, depth, order, type, self.ore_params)
             val_ind = AESCipher(key_rndkey).encrypt(val_ind._serialize())
             key_ind = encrypt(key_detkey, str(self.counter[key_ind]))
         else:

@@ -10,19 +10,34 @@ import yaml
 import json
 import time
 import pickle
-import config as cfg
+from lib.ore_wrapper import getInitiatedParams, OreVal
 
 Kd_key = "teste" #Deterministic master key
 Kr_key = "teste2" #Random master key
 
+flag = False #Flag to run encryption or not 
+ore_params = None #ore depends on the flag -o
+
+
 # Trata de tudo desde o .php até à estrutura de dados
 if __name__ == '__main__':
+    #get flag from command line arguments
+    for arg in sys.argv[1:-1]:
+        if arg == "-e" or arg == "--encrypt":
+            flag = True
+        elif arg == "-o" or arg == "--ore":
+            flag = True
+            ore_params = [getInitiatedParams() for _ in range(4)]
+        else:
+            print("Unrecognized argument: " + arg)
+
+
     start_time = time.time()
     config = yaml.safe_load(open("config.yaml"))
 
     # source ==> lextoken stream
-    file = open(sys.argv[1], 'r')
-    filename = sys.argv[1].split(".")[-2]
+    file = open(sys.argv[-1], 'r')
+    filename = sys.argv[-1].split(".")[-2]
     input_data = file.read()
     lexer.input(input_data)
 
@@ -42,15 +57,15 @@ if __name__ == '__main__':
     start_time = time.time()
     # intermediate ==> data structure
     data = DataStructure()
-    wrk = Worker(data, intermediate, Kr_key)
-    wrk.store(0, Kd_key, Kr_key)
+    wrk = Worker(data, intermediate, Kd_key,Kr_key,ore_params) if flag else Worker(data,intermediate) 
+    wrk.store(0)
     # print(data.data)
     #print("---Encryptor %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     vd = VulnerabilityDetector(data, Kd_key)
     #print("---VD %s seconds ---" % (time.time() - start_time))
     with open("output.txt", "w") as f:
-        if (cfg.flag):
+        if (flag):
             rnd_key = encrypt(Kr_key, "XSS_SENS")
             results = vd.detection(encrypt(Kd_key,"INPUT"),encrypt(Kd_key,"XSS_SENS"), encrypt(Kd_key,"XSS_SANS"), rnd_key)
         else:
