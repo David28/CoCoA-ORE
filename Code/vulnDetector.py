@@ -208,6 +208,4 @@ class VulnerabilityDetector(object):
             if x not in finalresult:
                 finalresult.append(x)
 
-        for i in finalresult:
-            print(i)
         return finalresult

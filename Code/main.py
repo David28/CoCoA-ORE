@@ -11,13 +11,14 @@ import json
 import time
 import pickle
 from lib.ore_wrapper import getInitiatedParams, OreVal
-
+from decryptor import decrypt_lineno
 Kd_key = "teste" #Deterministic master key
 Kr_key = "teste2" #Random master key
 
 flag = False #Flag to run encryption or not 
 ore_params = None #ore depends on the flag -o
-
+xss_sens_flag = True
+decrypt_lines_flag = False
 
 # Trata de tudo desde o .php até à estrutura de dados
 if __name__ == '__main__':
@@ -28,6 +29,10 @@ if __name__ == '__main__':
         elif arg == "-o" or arg == "--ore":
             flag = True
             ore_params = [getInitiatedParams() for _ in range(4)]
+        elif arg == "-s" or arg == "--sqli":
+            xss_sens_flag = False
+        elif arg == "-d" or arg == "--decrypt":
+            decrypt_lines_flag = True
         else:
             print("Unrecognized argument: " + arg)
 
@@ -64,13 +69,28 @@ if __name__ == '__main__':
     start_time = time.time()
     vd = VulnerabilityDetector(data, Kd_key)
     #print("---VD %s seconds ---" % (time.time() - start_time))
+    if xss_sens_flag:
+        input = "INPUT"
+        sens = "XSS_SENS"
+        sans = "XSS_SANS"
+    else:
+        input = "INPUT"
+        sens = "SQLi_SENS"
+        sans = "SQLi_SANS"
     with open("output.txt", "w") as f:
         if (flag):
-            rnd_key = encrypt(Kr_key, "XSS_SENS")
-            results = vd.detection(encrypt(Kd_key,"INPUT"),encrypt(Kd_key,"XSS_SENS"), encrypt(Kd_key,"XSS_SANS"), rnd_key)
+            rnd_key = encrypt(Kr_key, sens)
+            results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), rnd_key)
         else:
-            results = vd.detection("INPUT", "XSS_SENS", "XSS_SANS")
-
+            results = vd.detection(input, sens, sans)
+        for i in results:
+            print(i)
+        if decrypt_lines_flag:
+            results = decrypt_lineno(results, ore_params[0],100)
+        print()
+        print("Vulnerabilitys' path:")
+        for i in results:
+            print("* ",'->'.join(map(str,[x[1] for x in i])))
         for i in range(len(results)):
            for j in range(len(results[i])):
                results[i][j] = tuple(str(x) for x in results[i][j])
@@ -87,3 +107,4 @@ if __name__ == '__main__':
     with open("filesize.txt", "ab") as f:
         pickle.dump(data, f)
  #wc -l
+
