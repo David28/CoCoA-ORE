@@ -117,8 +117,9 @@ class Worker(object):
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
     def create_entry(self, key_ind, val_ind, lineno, depth, order, type):
+        #print(key_ind, "-->",val_ind)
         if self.kd_key and self.kr_key:
-            lineno = val_ind.lineno
+            val_lineno = val_ind.lineno
 
             key_ind = key_ind.type
             val_ind = val_ind.type 
@@ -132,7 +133,7 @@ class Worker(object):
             
             val_rndkey = encrypt(self.kr_key,val_ind)            
 
-            val_ind = MyEncryptedValue(MyToken(val_detkey,lineno), val_rndkey, lineno, depth, order, type, self.ore_params)
+            val_ind = MyEncryptedValue(MyToken(val_detkey,val_lineno), val_rndkey, lineno, depth, order, type, self.ore_params)
             val_ind = AESCipher(key_rndkey).encrypt(val_ind._serialize())
             key_ind = encrypt(key_detkey, str(self.counter[key_ind]))
         else:
