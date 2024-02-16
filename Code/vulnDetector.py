@@ -5,10 +5,13 @@ from cripto import *  # decrypt_aes
 from matplotlib.pyplot import close
 from ds import *
 
+def _isFunc(s):
+    return re.match(r"FUNC[0-9]+", s)
 
 class VulnerabilityDetector(object):
 
     def __init__(self, data, aeskey):
+        #print(data.data)
         self.ds = data
         self.output = []
         self.path = []
@@ -111,17 +114,26 @@ class VulnerabilityDetector(object):
                 group_by_vulns[i[0]] = [i]
         for k, v in group_by_vulns.items():
             # remove substitutions after vuln
-            for i in v:
-                lowest = i[0][1]
-                for j in i[1:]:
-                    if j[1] > lowest:
-                        try:
-                            v.remove(i)
-                        except:
-                            pass
-                    else:
-                        lowest = j[1]
+            #Commented out since there are valid paths where that conditiion happens when using functions
+            # Fixing by checking if in a function only works not cifered
 
+            # for i in v:
+            #     lowest = i[0][1]
+            #     inFunc = False
+            #     for j in i[1:]:
+            #         if _isFunc(j[0]):
+            #             inFunc = True
+            #             continue   
+            #         if j[1] > lowest and not inFunc:
+            #             try:
+            #                 print("Removing: ", i, "BECAUSE: ", j[1] , " > ", lowest)
+            #                 v.remove(i)
+            #             except:
+            #                 pass
+            #         else:
+            #             lowest = j[1]
+            #         inFunc = False
+            
             # depth checker
             # for i in range(1, max(len(x) for x in v)):
             #     for j in range(0, len(v)):z
@@ -139,7 +151,7 @@ class VulnerabilityDetector(object):
                             closest = v[j][i]
                             best_match = v[j]
             #print(closest)
-            #print(best_match)
+            #print("Best match:\n",best_match)
             # print("_______________________")
             if best_match[0] in final:
                 final[best_match[0]].append(best_match)

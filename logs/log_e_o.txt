@@ -1,6 +1,7 @@
+../Tests/multiple_functions.php
 ../Tests/simple.php
+../Tests/simplest_function.php
 ../Tests/Cases/Case4.php
-../Tests/Cases/Case2.php
 ../Tests/Cases/Case5.php
 ../Tests/Cases/Case6.php
 ../Tests/Cases/Case1.php
