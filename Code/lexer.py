@@ -161,7 +161,7 @@ def t_VAR(t):
 
 def t_COMMENT(t):
     #comments like # or // or /* */ or <!-- -->
-    r'(\#.*)|(\/\*[\s\S]*\*\/)|(\/\/.*)|(\<\!\-\-[\s\S]*\-\-\>)'
+    r'(\#.*)|(\/\*[\s\S]*\*\/)|(\/\/.*)'
     pass  # ignore this token
 
 
