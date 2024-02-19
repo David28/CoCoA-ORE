@@ -19,21 +19,7 @@ flag = False #Flag to run encryption or not
 ore_params = None #ore depends on the flag -o
 xss_sens_flag = True
 decrypt_lines_flag = False
-def extract_php(input_data):
-    #replace all non php code with blanks
-    in_php = False
-    result = ""
-    for line in input_data.split("\n"):
-        output = line
-        if "<?php" in line:
-            in_php = True
-        if not in_php:
-            output = ""
-        if "?>" in line:
-            in_php = False
-        
-        result += output + "\n"
-    return result
+
 # Trata de tudo desde o .php até à estrutura de dados
 if __name__ == '__main__':
     #get flag from command line arguments
@@ -58,8 +44,6 @@ if __name__ == '__main__':
     file = open(sys.argv[-1], 'r')
     filename = sys.argv[-1].split(".")[-2]
     input_data = file.read()
-    input_data = extract_php(input_data)
-
     lexer.input(input_data)
 
     lextokens = []

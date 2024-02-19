@@ -94,21 +94,23 @@ class VulnerabilityDetector(object):
             self.sse_search( start,end, init_rnd_key)
         else:
             self.search(start, end)
-        
         # operations over output
+        #for x in self.output:
+        #    print(x)
         final = {}
         group_by_vulns = {}
         myresult = []
 
         # tirar listas vazias
         self.output = [x for x in self.output if x]
-
         # agrupar por vulnerabilidades
+        # usar estrutura especial para poder usar ORE probabilistico
         for i in self.output:
-            if i[0] in group_by_vulns:
-                group_by_vulns[i[0]].append(i)
+            if ore_tuple(i[0]) in group_by_vulns:
+                group_by_vulns[ore_tuple(i[0])].append(i)
             else:
-                group_by_vulns[i[0]] = [i]
+                group_by_vulns[ore_tuple(i[0])] = [i] 
+
         for k, v in group_by_vulns.items():
             # remove substitutions after vuln
             for i in v:
@@ -121,15 +123,14 @@ class VulnerabilityDetector(object):
                             pass
                     else:
                         lowest = j[1]
-
             # depth checker
             # for i in range(1, max(len(x) for x in v)):
             #     for j in range(0, len(v)):z
             #         continue
             # find closest path to vulnerability
+            best_match = None
             for i in range(1, max(len(x) for x in v)):
                 closest = None
-                best_match = None
                 for j in range(0, len(v)):
                     if i < len(v[j]):
                         if not closest:
@@ -139,7 +140,7 @@ class VulnerabilityDetector(object):
                             closest = v[j][i]
                             best_match = v[j]
             #print(closest)
-            #print(best_match)
+            #print(best_match)   
             # print("_______________________")
             if best_match[0] in final:
                 final[best_match[0]].append(best_match)
@@ -209,3 +210,42 @@ class VulnerabilityDetector(object):
                 finalresult.append(x)
 
         return finalresult
+
+
+#hashable tuple that may contain probailistic ORE values
+#Allow probabilistic ORE values to have the same hash
+class ore_tuple:
+    vals = []
+    rep_key = []
+    def __init__(self, tup):
+        self.tup = tup
+        self.hash_rep = list(tup)
+        for i in range(len(tup)):
+            if len(ore_tuple.vals) <= i:
+                ore_tuple.vals.append({})
+                ore_tuple.rep_key.append(0)
+            if isinstance(tup[i], OreVal):
+                rep = None
+                for k, v in ore_tuple.vals[i].items():
+                    if v == tup[i]:
+                        rep = k
+
+                        break
+                if rep is None:
+                    rep = ore_tuple.rep_key[i]
+                    ore_tuple.vals[i][rep] = tup[i]
+                    ore_tuple.rep_key[i] += 1
+                self.hash_rep[i] = rep
+        self.hash_rep = tuple(self.hash_rep)
+    def __eq__(self, other):
+        for i in range(len(self.tup)):
+            if self[i] != other[i]:
+                return False
+        return True
+
+    def __hash__(self):
+        return hash(self.hash_rep)
+    
+    #index acess   
+    def __getitem__(self, key):
+        return self.tup[key]
