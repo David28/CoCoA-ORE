@@ -57,10 +57,12 @@ if __name__ == "__main__":
     rows = [["File", "Lexer Time", "Translator Time", "Encryptor Time", "VD Time"]]
     print("Testing files in: ", master_dir)
 
-
-    with Pool() as pool:
-        results = list(tqdm(pool.imap(test_file, php_files), total=len(php_files), desc="Testing files"))
-
+    results = []
+    for file in php_files:
+        #clean last line
+        print("Testing file: " + file[0])
+        results.append(test_file(file))
+    print("\n")
     #get true count value
     count = 0
     # # Update rows with results
