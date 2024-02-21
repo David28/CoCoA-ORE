@@ -160,7 +160,7 @@ class VulnerabilityDetector(object):
                         if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
                             boolskip = False
                     if boolskip:
-                        atual = group_by_vulns[i[0]]
+                        atual = group_by_vulns[ore_tuple(i[0])]
                         # ver se eh tudo fora de control flow
                         for verify in atual:
                             allzero = True
