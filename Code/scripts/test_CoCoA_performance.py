@@ -7,7 +7,6 @@ import subprocess
 import sys
 from multiprocessing import Pool
 import re
-from tqdm import tqdm
 
 master_dir = "../WebApps/"
 output = "performance.csv"
@@ -56,24 +55,24 @@ if __name__ == "__main__":
     rows = []
     rows = [["File", "Lexer Time", "Translator Time", "Encryptor Time", "VD Time"]]
     print("Testing files in: ", master_dir)
+    count = 0
 
     results = []
     for file in php_files:
-        #clean last line
-        print("Testing file: " + file[0])
-        results.append(test_file(file))
-    print("\n")
-    #get true count value
-    count = 0
-    # # Update rows with results
-    for i, (file_to_test, result) in enumerate(results):
-        results =  extract_performace_values(result)
-        rows.append([file_to_test] + list(results))
         count += 1
+        print("Testing file: " + file[0])
+        result = test_file(file)
+        result = extract_performace_values(result[1])
+        #remove cientific notation and use comma as decimal separator
+        result = [f"{x:.20f}".replace(".",",") if x is not None else "" for x in result]
+        rows.append([file[0]] + list(result))
+
+
     
     # #create a new csv with the output
-    with open(output, 'w') as file:
-        csv_writer = csv.writer(file)
-        csv_writer.writerows(rows)
+    #dont use cientific notation
+    with open(output, 'w', newline='') as file:
+        writer = csv.writer(file, delimiter='\t')
+        writer.writerows(rows)
     print("Total files found: " + str(count))
    
