@@ -1,5 +1,4 @@
 #Script to test the performance of the CoCoA tool
-#Make sure to have the main.py file in the same directory as this file
 #And all the prints are not commented out
 #folders to test must be on the master_dir variable (.../WebApps/ by default)
 import csv
@@ -10,6 +9,9 @@ from multiprocessing import Pool
 import re
 from tqdm import tqdm
 
+master_dir = "../WebApps/"
+output = "performance.csv"
+flags = ["-e"] #change this to run with/witout encryption and with/without ore
 
 def test_file(file_info):
     # Unpack file_info
@@ -43,23 +45,19 @@ def extract_performace_values(output):
     vd_time = float(search.search(output).group(1)) if search.search(output) else None
     return lexer_time, translator_time, encryptor_time, vd_time
 if __name__ == "__main__":
-    #test all php files in all subdirectories 
-    master_dir = "../WebApps/"
-    output = "performance.csv"
+
     php_files = []
     for path, subdires, files in os.walk(master_dir):
         for file in files:
             if file.endswith(".php"):
                 php_files.append(os.path.join(path, file))
 
-    php_files = [(file, ["-e"], master_dir) for file in php_files]
+    php_files = [(file, flags, master_dir) for file in php_files]
     rows = []
     rows = [["File", "Lexer Time", "Translator Time", "Encryptor Time", "VD Time"]]
     print("Testing files in: ", master_dir)
 
 
-    # Prepare file_info for each file to be tested
-    # Parallelize file testing
     with Pool() as pool:
         results = list(tqdm(pool.imap(test_file, php_files), total=len(php_files), desc="Testing files"))
 

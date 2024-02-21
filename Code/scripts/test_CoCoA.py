@@ -1,5 +1,4 @@
 #Script to test the performance of the CoCoA tool
-#Make sure to have the main.py file in the same directory as this file
 import csv
 import os
 import subprocess
