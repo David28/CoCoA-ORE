@@ -66,7 +66,7 @@ if __name__ == '__main__':
         if not tok:
             break      # No more input
         lextokens.append(tok)
-        print(tok)
+        #print(tok)
     print("---Lexer %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     # lextoken stream ==> intermediate language

@@ -92,11 +92,9 @@ class Worker(object):
                 self.type = aux
             elif curr.type == "IF":
                 next = self.tokenstream[self.next+1]
-                print("\n",next,"\n")
                 while next.type != "END_COND":
                     self.next += 1
                     next = self.tokenstream[self.next]
-                    print(next)
                 self.next += 1
                 if len(self.order) == depth+1:
                     self.order.append(0)

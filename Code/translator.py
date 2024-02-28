@@ -79,7 +79,7 @@ class Translator(object):
         in_func = None # to store the name of the function definition we are in
         while i < len(lextokens):
             tok = lextokens[i]
-            print(tok)
+            #print(tok)
             # ignorar parametros passados numa entrypoint
             if tok.type == "INPUT" and lextokens[i+1].type == "LPAREN":
                 del lextokens[i+1]
@@ -106,7 +106,6 @@ class Translator(object):
 
                 mytokens.append(
                     MyToken(func_prefix+"VAR"+str(var.index(tok.value)), tok.lineno))
-                print(tok,"-->",mytokens[-1].type)
             elif tok.type == "FUNC":
                 bracecount.append("ENDFUNCBLOCK")
                 funcname = lextokens[i+1]
@@ -116,8 +115,6 @@ class Translator(object):
                     MyToken("FUNC"+str(func.index(funcname.value)), funcname.lineno))
                 del lextokens[i+1]
                 in_func = mytokens[-1].type
-                print("aahhah")
-
             elif tok.type == "INPUT":
                 mytokens.append(
                     MyToken("INPUT", tok.lineno))

@@ -68,7 +68,6 @@ if __name__ == "__main__":
                 true_negatives += 1
             else:
                 false_negatives += 1
-                print(file_to_test)
 
     with open(output, 'w') as file:
         csv_writer = csv.writer(file)
