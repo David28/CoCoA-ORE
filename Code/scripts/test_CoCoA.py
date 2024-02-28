@@ -19,6 +19,7 @@ def test_file(file_info):
         
         if p.returncode != 0:
             result = "Error"
+            
         else:
             result = p.stdout.decode('utf-8').rstrip('\n')
 
@@ -26,8 +27,8 @@ def test_file(file_info):
     return file_to_test, result, None
 
 if __name__ == "__main__":
-    info_xss = ("../SARD2_XSS/", ["-o", "-d"], "output_XSS.csv","CoCoA Testes Unitários - XSS.csv")
-    info_sqli = ("../SARD_SQLI_Merged/", ["-s","-o", "-d"], "output_SQLi.csv", "CoCoA Testes Unitários - SQLI.csv")
+    info_xss = ("../SARD2_XSS/", ["-o", "-d", "-p"], "output_XSS.csv","CoCoA Testes Unitários - XSS.csv")
+    info_sqli = ("../SARD_SQLI_Merged/", ["-s","-o", "-d", "-p"], "output_SQLi.csv", "CoCoA Testes Unitários - SQLI.csv")
     info = info_sqli if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_xss
 
     files_dir, flags, output, csv_file = info_xss if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_sqli
@@ -52,8 +53,7 @@ if __name__ == "__main__":
             continue
         
         rows[i][10] = result
-        if (("[(" in rows[i][9]) ^ ("Vulnerabilitys" in result)) or (("Error" in result) ^ ("Error" in rows[i][9])):
-            print(rows[i])
+       
         count += 1
         if result == "Error":
             error_count += 1
@@ -68,6 +68,7 @@ if __name__ == "__main__":
                 true_negatives += 1
             else:
                 false_negatives += 1
+                print(file_to_test)
 
     with open(output, 'w') as file:
         csv_writer = csv.writer(file)

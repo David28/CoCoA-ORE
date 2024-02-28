@@ -34,6 +34,8 @@ class MyValue(object):
         #have to indicate if we are using ore or not
         return ("ore;;" if isinstance(self.flowinfo, OreVal) else "") + str(self.lineno) + ";;" + str(self.flowinfo) + ";;" + self.token.type + ";;" + str(self.token.lineno) + ";;" + str(self.order) + ";;" + str(self.type)
 
+    def to_bytes(self):
+        return bytes(self.lineno)+bytes(self.flowinfo)+bytes(self.token)+bytes(self.order)+bytes(self.type)
     @classmethod
     def _deserialize(self, text):
         a = text.split(";;")

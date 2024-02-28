@@ -30,7 +30,8 @@ keywords = {
     # Misc
     'return': 'RETURN',
     'php': 'PHP',
-    'function': 'FUNC'
+    'function': 'FUNC',
+    'class': 'CLASS',
 }
 
 
@@ -58,6 +59,7 @@ tokens = list(keywords.values()) + [
 
     # Input Functions
     'INPUT'
+
 ] + [i['name']+'_SENS' for i in config['VULNS']] + [i['name']+'_SANS' for i in config['VULNS']]
 
 t_POINTER = r'->'
@@ -151,8 +153,10 @@ def t_VAR(t):
         elif t.value in vuln['sanitization_functions']:
             t.type = vuln['name']+'_SANS'
             return t
-
-    if t.value[0] != '$' and t.type == 'VAR':
+    if t.value == 'NULL' or t.value == 'null':
+        t.type = 'STRING_LITERAL'
+        return t
+    elif t.value[0] != '$' and t.type == 'VAR':
         t.type = 'FUNC_CALL'
         return t
 

@@ -35,7 +35,7 @@ class Worker(object):
         self.ds = ds
         self.tokenstream = tokenstream
         self.counter = {}    
-        
+        print(self.tokenstream)
         self.next = 0
         self.order = [0]
         self.type = 0
@@ -57,6 +57,8 @@ class Worker(object):
                 self.next += 2
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_ASSIGN":
+                    if key.type == "VAR2":
+                        print("VAR2: ", curr.type)
                     if curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
                         self.next += 1
                         dummie = self.tokenstream[self.next]
@@ -82,19 +84,21 @@ class Worker(object):
                     curr = self.tokenstream[self.next]
             elif curr.type == "ELSEIF" or curr.type == "CASE":
                 next = self.tokenstream[self.next+1]
-                while next.type != "END_COND":
+                while next.type != "END_COND" and next.type != "ENDCASE":
                     self.next += 1
                     next = self.tokenstream[self.next]
                 self.next += 1
                 aux = self.type
                 self.type += 1  # TODO
-                self.store(depth+1)
+                self.store(depth)
                 self.type = aux
             elif curr.type == "IF":
                 next = self.tokenstream[self.next+1]
+                print("\n",next,"\n")
                 while next.type != "END_COND":
                     self.next += 1
                     next = self.tokenstream[self.next]
+                    print(next)
                 self.next += 1
                 if len(self.order) == depth+1:
                     self.order.append(0)
@@ -108,7 +112,7 @@ class Worker(object):
                 self.next += 1
                 aux = self.type
                 self.type = -1  # TODO
-                self.store(depth+1)
+                self.store(depth)
                 self.type = aux
             elif curr.type == "ENDIF" or curr.type == "ENDELSE" or curr.type == "ENDELSEIF" or curr.type == "ENDCASE":
                 return
@@ -117,7 +121,7 @@ class Worker(object):
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
     def create_entry(self, key_ind, val_ind, lineno, depth, order, type):
-        #print(key_ind, "-->",val_ind)
+        print(key_ind, "-->",val_ind)
         if self.kd_key and self.kr_key:
             val_lineno = val_ind.lineno
 

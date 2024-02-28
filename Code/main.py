@@ -12,6 +12,7 @@ import time
 import pickle
 from lib.ore_wrapper import getInitiatedParams, OreVal
 from decryptor import decrypt_lineno
+from preprocessor import preprocess_php
 Kd_key = "teste" #Deterministic master key
 Kr_key = "teste2" #Random master key
 
@@ -19,7 +20,7 @@ flag = False #Flag to run encryption or not
 ore_params = None #ore depends on the flag -o
 xss_sens_flag = True
 decrypt_lines_flag = False
-
+preprocess_flag = False
 # Trata de tudo desde o .php até à estrutura de dados
 if __name__ == '__main__':
     #get flag from command line arguments
@@ -33,10 +34,21 @@ if __name__ == '__main__':
             xss_sens_flag = False
         elif arg == "-d" or arg == "--decrypt":
             decrypt_lines_flag = True
+        elif arg == "-p" or arg == "--preprocess":
+            preprocess_flag = True
         else:
             print("Unrecognized argument: " + arg)
 
-
+    if xss_sens_flag:
+        input = "INPUT"
+        sens = "XSS_SENS"
+        sans = "XSS_SANS"
+    else:
+        input = "INPUT"
+        sens = "SQLi_SENS"
+        sans = "SQLi_SANS"
+        
+    
     start_time = time.time()
     config = yaml.safe_load(open("config.yaml"))
 
@@ -44,6 +56,8 @@ if __name__ == '__main__':
     file = open(sys.argv[-1], 'r')
     filename = sys.argv[-1].split(".")[-2]
     input_data = file.read()
+    if preprocess_flag:
+        input_data = preprocess_php(input_data)
     lexer.input(input_data)
 
     lextokens = []
@@ -52,7 +66,7 @@ if __name__ == '__main__':
         if not tok:
             break      # No more input
         lextokens.append(tok)
-        #print(tok)
+        print(tok)
     print("---Lexer %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     # lextoken stream ==> intermediate language
@@ -68,15 +82,7 @@ if __name__ == '__main__':
     print("---Encryptor %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     vd = VulnerabilityDetector(data, Kd_key)
-    print("---VD %s seconds ---" % (time.time() - start_time))
-    if xss_sens_flag:
-        input = "INPUT"
-        sens = "XSS_SENS"
-        sans = "XSS_SANS"
-    else:
-        input = "INPUT"
-        sens = "SQLi_SENS"
-        sans = "SQLi_SANS"
+    
     with open("output.txt", "w") as f:
         print(input,sens)
         if (flag):
@@ -84,6 +90,8 @@ if __name__ == '__main__':
             results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), rnd_key)
         else:
             results = vd.detection(input, sens, sans)
+        print("---VD %s seconds ---" % (time.time() - start_time))
+        
         for i in results:
             print(i)
         if decrypt_lines_flag:
@@ -98,14 +106,12 @@ if __name__ == '__main__':
         f.write(json.dumps(results))
         f.close()
     
-    #have to serialize the data structure because it has pointers
-    for key in data.data:
-        for val in data.data[key]:
-            if (type(val) is MyValue):
-                data.data[key] = val._serialize()
-            elif (type(val) is OreVal):
-                data.data[key] = val._serialize()
-    with open("filesize.txt", "ab") as f:
-        pickle.dump(data, f)
+    #remove BASE_DEPTH from dictionary
+    data.data.pop("BASE_DEPTH", None)
+    
+    #convert everything to bytes
+    with open("filesize.txt", "wb") as f:
+        pickle.dump(data.data, f)
+
  #wc -l
 

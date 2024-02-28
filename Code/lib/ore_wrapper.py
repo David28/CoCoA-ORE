@@ -137,6 +137,9 @@ class OreVal():
     def __repr__(self):
         return str(self)
 
+    def to_bytes(self):
+        return convert_struct_to_bytes(self.ctxt)
+
 
 def getInitiatedParams():
     nbits = 32
