@@ -243,7 +243,6 @@ class Translator(object):
                 mytokens.append(
                     MyToken("CLASS", tok.lineno))
                 #TODO: Fix class logic, this is just a placeholder to reduce errors
-            elif in_func and my
             elif tok.type in ignore:
                 pass
             else:

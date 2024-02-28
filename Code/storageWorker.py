@@ -35,7 +35,7 @@ class Worker(object):
         self.ds = ds
         self.tokenstream = tokenstream
         self.counter = {}    
-        print(self.tokenstream)
+        
         self.next = 0
         self.order = [0]
         self.type = 0
@@ -57,8 +57,6 @@ class Worker(object):
                 self.next += 2
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_ASSIGN":
-                    if key.type == "VAR2":
-                        print("VAR2: ", curr.type)
                     if curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
                         self.next += 1
                         dummie = self.tokenstream[self.next]
@@ -121,7 +119,7 @@ class Worker(object):
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
     def create_entry(self, key_ind, val_ind, lineno, depth, order, type):
-        print(key_ind, "-->",val_ind)
+        #print(key_ind, "-->",val_ind)
         if self.kd_key and self.kr_key:
             val_lineno = val_ind.lineno
 
