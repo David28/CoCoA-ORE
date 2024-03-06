@@ -166,6 +166,7 @@ def t_VAR(t):
 def t_COMMENT(t):
     #comments like # or // or /* */ or <!-- -->
     r'(\#.*)|(\/\*[\s\S]*\*\/)|(\/\/.*)'
+    t.lexer.lineno += t.value.count("\n")
     pass  # ignore this token
 
 

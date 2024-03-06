@@ -3,3 +3,5 @@ env/
 SARD2_XSS/
 SARD_SQLI_Merged/
 *.csv
+WebApps/*
+WebAppsComplete/*

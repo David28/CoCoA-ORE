@@ -1,6 +1,7 @@
 <?php
 
-function test2(){
+function test2($a){
+    $a = "safe";
     return $_GET['UserData'];
 }
 

@@ -15,7 +15,8 @@ def preprocess_php(input_data):
             output = ""
         if "?>" in line:
             in_php = False
-        output = preprocess_casts(output)
+        if re.compile(r'\$\w+\s*').match(output):
+            output = preprocess_casts(output)
         result += output + "\n"
     return result
 var_pattern = r'(?:(?:\$\w+)|(?:[\",\']\w+[\",\'])|(?:\w+\(.+\)))'
@@ -23,7 +24,7 @@ var_pattern = r'(?:(?:\$\w+)|(?:[\",\']\w+[\",\'])|(?:\w+\(.+\)))'
 #turn this (int) 5; into intval(5);
 def convert_explicit_cast_to_function(php_code): 
     #int, float, string, bool, array, object
-    pattern = r'(?=\(\s*(int|float|string|bool)\s*\)).+;'
+    pattern = r'$\w+\s*(?=\(\s*(int|float|string|bool)\s*\)).+;'
     if not re.compile(pattern).search(php_code):
         return php_code
     cast_pattern = r'\(\s*(int|float|string|bool)\s*\)'
@@ -54,11 +55,11 @@ def convert_op_assign(php_code):
 #turn $a = $a + 0; into $a = intval($a) +0;
 #or $a = $a + 0.0 + $b + '5'; into $a = floatval($a) +0.0 + floatval($b+'5');
 def convert_sum_cast_to_function(php_code):
-    whole_pattern = r'[\+\-\*\/\%]?\s*\=\s*(?:'+var_pattern+'.*\d+(?:\.\d+)?\s*.*\s*)|(?:\d+(?:\.\d+)?.*'+var_pattern+'\s*);'
+    whole_pattern = r'\$\w+[\+\-\*\/\%]?\s*\=\s*(?:'+var_pattern+'.*\d+(?:\.\d+)?\s*.*\s*)|(?:\d+(?:\.\d+)?.*'+var_pattern+'\s*);'
     match = re.compile(whole_pattern).search(php_code)
     new_code = php_code
     if match:
-
+        print(match)
         #get full match 
         #find int or float
         digit = re.compile(r'(\d+(\.\d+)?)').search(php_code).group(1)

@@ -1,18 +1,22 @@
-<<<<<<< HEAD
 <?php
 $user = $_POST['user'];
 $pass = $_POST['pass'];
-
-
+setcookie("user:", $user);
+$connect = mysql_connect("localhost", "ghost", "ghost");
+if(!$connect)
+	{
+		die ("Could Not Connect:" . mysql_error());
+	}
+	
 mysql_select_db("ghost", $connect);
 
 $sql = "SELECT * FROM q";
 
 $valid = mysql_query($sql, $connect);
 
-	while(1==1)
+	while($data = mysql_fetch_array($valid))
 		{
-		if(1==1)
+		if($data['user'] == $user && $data['pass'] == $pass || $user == "\'or 1=1--")
 			{
 				echo "<input type='hidden' value='".$user."' />";
 				echo "<META HTTP-EQUIV=REFRESH CONTENT='0; URL=iframe.php?page=form.php'>";
@@ -28,42 +32,8 @@ $valid = mysql_query($sql, $connect);
 }
 		
 
+mysql_close($connect);
 
 
 
 ?>
-=======
-<?php
-$user = $_POST['user'];
-$pass = $_POST['pass'];
-
-
-mysql_select_db("ghost", $connect);
-
-$sql = "SELECT * FROM q";
-
-$valid = mysql_query($sql, $connect);
-
-	while(1==1)
-		{
-		if(1==1)
-			{
-				echo "<input type='hidden' value='".$user."' />";
-				echo "<META HTTP-EQUIV=REFRESH CONTENT='0; URL=iframe.php?page=form.php'>";
-			}
-		else
-			{
-				
-				echo "<META HTTP-EQUIV=REFRESH CONTENT='0; URL=iframe.php?page=form.php'>";
-				echo "<div>".stripslashes($user)."</div><br />";
-				
-				
-			}
-}
-		
-
-
-
-
-?>
->>>>>>> ba4a299c8bbc2839742f2676de5ca1492ae8e1c0

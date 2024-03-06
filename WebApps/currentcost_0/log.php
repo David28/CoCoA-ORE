@@ -16,7 +16,7 @@ if (!$con)
 mysql_select_db($db, $con);
 
 
-mysql_query($watts, $temp, $joules);
+mysql_query("INSERT INTO consumption (power, temp, joules, time) VALUES ($watts, $temp, $joules, '$now')");
 mysql_close($con);
 
 ?>

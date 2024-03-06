@@ -58,6 +58,8 @@ if __name__ == '__main__':
     input_data = file.read()
     if preprocess_flag:
         input_data = preprocess_php(input_data)
+    print("---Preprocessor %s seconds ---" % (time.time() - start_time))
+    start_time = time.time()
     lexer.input(input_data)
 
     lextokens = []

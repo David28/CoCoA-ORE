@@ -12,10 +12,10 @@ $sql = "SELECT * FROM q";
 
 $valid = mysql_query($sql, $connect);
 
-	while(1==1)
+	while($data = mysql_fetch_array($valid))
 		{
-				$data = $_GET("usenram");
-				echo $data;
+
+				echo "<div><p>".$data['user']." wrote: ".stripslashes($data['blog'])."</p></div>";
 				
 }
 		

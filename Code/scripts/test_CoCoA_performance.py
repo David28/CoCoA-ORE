@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import re
 
 run_count = 5 #number of times to run each file
-master_dir = "../WebApps/"
+master_dir = "../WebAppsComplete/"
 info = [("performance.csv", []), ("performance_e.csv", ["-e"]), ("performance_o.csv", ["-o"])]
 
 
@@ -21,7 +21,7 @@ def test_file(file_info,flags, timeout=5):
     if os.path.isfile(files_dir + file_to_test):
         # Get the output of the main.py with flags -o -d
         try:
-            p = subprocess.run(["python3", "main.py"] + flags + [file_to_test], capture_output=True, timeout=timeout)
+            p = subprocess.run(["python3", "main.py"] + flags+ ["-p"] + [file_to_test], capture_output=True, timeout=timeout)
         except subprocess.TimeoutExpired:
             result = "Timeout"
             return file_to_test, result, None
@@ -34,6 +34,9 @@ def test_file(file_info,flags, timeout=5):
     return file_to_test, result, None
 
 def extract_performace_values(output):
+    #print("---Preprocessor %s seconds ---" % (time.time() - start_time))
+    search = re.compile(r"---Preprocessor (.+) seconds ---")
+    preprocessor_time = float(search.search(output).group(1)) if search.search(output) else None
     # print("---Lexer %s seconds ---" % (time.time() - start_time))
     search = re.compile(r"---Lexer (.+) seconds ---")
     lexer_time = float(search.search(output).group(1)) if search.search(output) else None
@@ -50,19 +53,19 @@ def extract_performace_values(output):
     #disk usage by the encrypted index read the dump file size filesize.txt
     filesize = os.path.getsize("filesize.txt")
     
-    return lexer_time, translator_time, encryptor_time, vd_time, filesize
+    return preprocessor_time,lexer_time, translator_time, encryptor_time, vd_time, filesize
 if __name__ == "__main__":
 
     php_files = []
     for path, subdires, files in os.walk(master_dir):
         for file in files:
-            if file.endswith(".php"):
+            if file.endswith(".php") or file.endswith(".phps"):
                 php_files.append(os.path.join(path, file))
     php_files = [(file, master_dir) for file in php_files]
     
     for output, flags in info:    
         rows = []
-        rows = [["WebApp", "Lexer Time", "Translator Time", "Encryptor Time", "VD Time", "Encrypted Index Size"]]
+        rows = [["WebApp","Preprocessor", "Lexer Time", "Translator Time", "Encryptor Time", "VD Time", "Encrypted Index Size", "Success Files Count", "Disk Space", "LOC"]]
         print("Testing files in: ", master_dir)
         count = 0
 
@@ -74,15 +77,23 @@ if __name__ == "__main__":
             for i in range(run_count):
                 result = test_file(file, flags)
                 if result[1] == "Error" or result[1] == "Timeout":
-                    print("Error in file: " + file[0])
+                    #print("Error in file: " + file[0])
                     #delete that file from the directory
-                    os.remove(file[0])
-                    sys.exit(1)
+                    #os.remove(file[0])
+                    #sys.exit(1)
+                    continue
                 result = extract_performace_values(result[1])
 
                 avgs.append(result)
+            if len(avgs) < run_count:
+                print("Error: ", file[0])
+                continue
             avgs = [sum(x)/run_count for x in zip(*avgs)]
-            result = [file[0]] + avgs
+            size_of_file = os.path.getsize(file[0])
+            loc_of_file = 0
+            with open(file[0], 'r') as f:
+                loc_of_file = len(f.readlines())
+            result = [file[0]] + avgs + [1,size_of_file, loc_of_file]
             #remove cientific notation and use comma as decimal separator
             print(result)
             rows.append(result)
@@ -94,6 +105,7 @@ if __name__ == "__main__":
             app = result[0].split("/")[2]
             if app in grouped:
                 #sum the values
+                result = result 
                 for i in range(1, len(result)):
                     grouped[app][i] = grouped[app][i] + result[i]
             else:

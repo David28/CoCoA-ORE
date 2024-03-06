@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 $user = $_POST['user'];
 $blogPost = $_POST['vuln'];
@@ -12,33 +11,9 @@ if(!$connect)
 	
 mysql_select_db("ghost", $connect);
 
-$sql = "UPDATE q SET blog={$blogPost} WHERE user={$user}";
+$sql = "UPDATE q SET blog='".$blogPost."' WHERE user='".$user."'";
 
-$valid = mysqli_query($sql);
-
-echo "<META HTTP-EQUIV=REFRESH CONTENT='0; URL=iframe.php?page=form.php'>";
-
-mysql_close($connect);
-
-
-
-=======
-<?php
-$user = $_POST['user'];
-$blogPost = $_POST['vuln'];
-echo $user;
-echo $blogPost;
-$connect = mysql_connect("localhost", "ghost", "ghost");
-if(!$connect)
-	{
-		die ("Could Not Connect:" . mysql_error());
-	}
-	
-mysql_select_db("ghost", $connect);
-
-$sql = "UPDATE q SET blog={$blogPost} WHERE user={$user}";
-
-$valid = mysqli_query($sql);
+$valid = mysql_query($sql, $connect);
 
 echo "<META HTTP-EQUIV=REFRESH CONTENT='0; URL=iframe.php?page=form.php'>";
 
@@ -46,5 +21,4 @@ mysql_close($connect);
 
 
 
->>>>>>> ba4a299c8bbc2839742f2676de5ca1492ae8e1c0
 ?>
