@@ -1,6 +1,4 @@
-../Tests/multiple_functions.php
 ../Tests/simple.php
-../Tests/simplest_function.php
 ../Tests/Cases/Case4.php
 ../Tests/Cases/Case5.php
 ../Tests/Cases/Case6.php
@@ -25,11 +23,3 @@
 ../WebApps/samate-2013-07-24-22-34-03/sql_lod2.php
 ../WebApps/ghost/blogSub.php
 ../WebApps/ghost/login.php
-../WebApps/ghost/header.php
-../WebApps/ghost/submit.php
-../WebApps/ghost/blog.php
-../WebApps/ghost/blogView.php
-../WebApps/DVWA/dns-lookup.php
-../WebApps/DVWA/user-info-remake.php
-../WebApps/DVWA/user-poll.php
-../WebApps/DVWA/user-info.php

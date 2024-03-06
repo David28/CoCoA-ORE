@@ -7,7 +7,7 @@ from lib.ore_wrapper import OreVal
 
 
 def _isVar(typestr):
-    pattern = re.compile(r'VAR[0-9]+')
+    pattern = re.compile(r'^(FUNC[0-9]+_)?VAR[0-9]+')
     return pattern.match(typestr)
 
 
@@ -29,11 +29,14 @@ def _isSens(tok):
         return True
     return False
 
-
+def _isFunc(tok):
+    pattern = re.compile(r'^FUNC[0-9]+$')
+    return pattern.match(tok)
 class Worker(object):
     def __init__(self, ds, tokenstream, kd_key=None, kr_key=None, ore_params=None):
         self.ds = ds
         self.tokenstream = tokenstream
+        #print("\nTokenstream: ", tokenstream)
         self.counter = {}    
         
         self.next = 0
@@ -46,17 +49,19 @@ class Worker(object):
             self.ds.put("BASE_DEPTH", OreVal(0, self.ore_params[1][0], self.ore_params[1][1]))
         else:
             self.ds.put("BASE_DEPTH", 0)
+        self.inFunction = [] #stack of function we are in
 
     def store(self, depth):
         if self.next >= len(self.tokenstream):
             return
         else:
             curr = self.tokenstream[self.next]
+            #print("Curr: ", curr)
             if _isVar(curr.type) and self.next+1 < len(self.tokenstream) and self.tokenstream[self.next+1].type == "OP0":
                 key = curr
                 self.next += 2
                 curr = self.tokenstream[self.next]
-                while curr.type != "END_ASSIGN":
+                while curr.type != "END_ASSIGN" :
                     if curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
                         self.next += 1
                         dummie = self.tokenstream[self.next]
@@ -67,9 +72,10 @@ class Worker(object):
                             dummie = self.tokenstream[self.next]
                     if not _isOP(curr.type):
                         self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
-                        
+                    
                     self.next += 1
                     curr = self.tokenstream[self.next]
+                
             elif curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
                 key = curr
                 self.next += 1
@@ -77,9 +83,16 @@ class Worker(object):
                 while curr.type != "END_CALL":
                     if not _isOP(curr.type):
                         self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
-                        
                     self.next += 1
                     curr = self.tokenstream[self.next]
+            elif _isFunc(curr.type):
+                self.inFunction.append(curr)
+            elif curr.type == "RETURN" and len(self.inFunction) > 0:
+                self.next += 1
+                curr = self.tokenstream[self.next]
+                self.create_entry(self.inFunction[-1], curr, curr.lineno, depth, self.order[depth], self.type)
+            elif curr.type == "ENDFUNCBLOCK" and len(self.inFunction) > 0:
+                self.inFunction.pop()
             elif curr.type == "ELSEIF" or curr.type == "CASE":
                 next = self.tokenstream[self.next+1]
                 while next.type != "END_COND" and next.type != "ENDCASE":
