@@ -49,16 +49,16 @@ if __name__ == '__main__':
         sans = "SQLi_SANS"
         
     
-    start_time = time.time()
     config = yaml.safe_load(open("config.yaml"))
-
     # source ==> lextoken stream
     file = open(sys.argv[-1], 'r')
     filename = sys.argv[-1].split(".")[-2]
     input_data = file.read()
+
+    start_time = time.time()
     if preprocess_flag:
         input_data = preprocess_php(input_data)
-    print("---Preprocessor %s seconds ---" % (time.time() - start_time))
+        print("---Preprocessor %s seconds ---" % (time.time() - start_time))
     start_time = time.time()
     lexer.input(input_data)
 

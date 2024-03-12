@@ -1,5 +1,5 @@
 import re
-
+import sys
 #Extract php snippets only from the code and convert explicit casts to functions
 # so that they can be recognized by cocoa as sanitization functions
 cast_pattern = re.compile(r'\(\s*(int|float|string|bool)\s*\)')
@@ -9,11 +9,11 @@ def preprocess_php(input_data):
     result = ""
     for line in input_data.split("\n"):
         output = line
-        if "<?php" in line:
+        if re.compile(r'(<\s*\?\s*php)|(<\s*\?\s*PHP)').search(line):
             in_php = True
         if not in_php:
             output = ""
-        if "?>" in line:
+        if re.compile(r'\?\s*>').search(line):
             in_php = False
         if re.compile(r'\$\w+\s*').match(output):
             output = preprocess_casts(output)
