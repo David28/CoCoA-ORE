@@ -7,8 +7,6 @@ import time
 # Load the shared library into c types.
 ore = CDLL(os.path.relpath("./lib/libore.so"))
 
-size_of_structs = ore.size_of_structs
-size_of_structs.restype = c_int
 
 # // the public parameters for the encryption scheme, used to compare ciphertexts
 # typedef struct {
