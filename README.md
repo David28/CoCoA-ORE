@@ -10,7 +10,10 @@ Download the .zip of the "Code" folder and extract it in your desired location.
 
 # Execution
 
-Before trying to execute the tool make sure all the dependencies listed below are installed in your system.
+
+Before trying to execute the tool make sure all the dependencies listed below are installed in your system. Then run the setup script:
+
+> setup.sh
 
 To execute CoCoA, open a terminal inside the Code/ folder and execute the main.py file with the file you wish to verify as parameter. Example:
 
@@ -27,8 +30,15 @@ Use the flags:
 - Pycryptodome
 - Ply
 - matplotlib
+- Non python related:
+  - gcc
+  - make
 
 
+#### Acknowledgements
+
+A big thanks to the fastore repository for a easy to use and relatively fast implementation of order revealing encryption:
+- https://github.com/kevinlewi/fastore
 
 
  
