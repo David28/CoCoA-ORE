@@ -1,0 +1,44 @@
+0.32
+	* Slight cosmetic changes
+	* Bugfix : Since version 5.0 iOS allows for native scrolling in web apps
+	  we do now detect which version is running and decide whether or not we
+	  need iScroll (Thanks to Gerd Niemetz for reporting this issue)
+	* Copyright in splash screen fixed
+
+0.31
+Bugfixes, cosmetic enhancements
+	* Contexts (predefined filters) can now be selected from the setup UI
+	  (see README.TXT and include/config.php)
+	* Landscape orientation now show the toolbar as expected
+	* it's no longer required to have "short_open_tag" enabled in php.ini
+
+Due to limited resources, I'm now focusing on supporting iOS devices ONLY. This means
+ZiPEC may not display correctly on some devices, and may even not work as expected.
+However, and as always, the door is open to anyone who may want to help, by sharing
+specific CSS code for other platforms.
+
+0.3
+Various features added
+	* It is now possible to aknowledge/unacknowledge events from ZiPEC
+	* Event log gets updated ("Event state changed to Acknowledged from ZiPEC")
+	* One finger scroll listing, instead of two previously
+	* Ability to show only new alerts or all
+	* New icon, provided by Shannon Gernyi (Thanks !)
+	* Splash Screen added at startup (previously, an outdated snapshot of the list was shown,
+	  which was a bit misleading)
+	* Current Alerts Porlets allows you to access your events list from
+	  the dashboard using the 'site window' portlet
+	* Portrait/Landscape orientations are now both supported	
+
+0.2
+Optimizations
+	* Ajax driven refresh
+	* Blackberry specific CSS used (WiP)
+0.11
+Bugfixes
+	* Fixed PHP tags in layout.php
+	* 'Summary' is now fetched instead of 'Message', so transforms are now displayed
+	
+
+0.1
+Initial Release

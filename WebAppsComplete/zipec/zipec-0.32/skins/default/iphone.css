@@ -1,0 +1,297 @@
+/* iPEC Default Skin for iPhone / iPod Touch */
+
+/* fonts */
+
+
+/* iPhone Viewport is 320*480  Status bar : 20px -> iPEC UI is 320*460 */
+
+body, div { margin: 0px; padding: 0px; /*font-family: netto, Trebuchet MS, Calibri, Sans-Serif;*/ }
+* { font-family: 'Droid Sans', Sans-Serif; }
+img { margin: 0px; border: 0px; }
+div { margin: 0px; padding: 0px; border: 0px solid #000000; }
+p { margin: 0px; }
+
+/* This container fills the entire user viewport */
+.container { 	width: 100%;  background-image: url('img/bg.gif'); background-repeat: repeat; } 
+
+
+
+/* Header height is 43px */
+.header, .headerOverlay {
+		width: 100%; height: 43px;  position: absolute; top: 0px;
+}
+
+/* This contains the logo provided by the skin */
+.header { 	 
+		z-index: 5;
+		background-color: #000;		
+		background-image: url('img/zenoss.png') ;
+		background-position: center;
+		background-repeat: no-repeat; 
+}
+/* This contains the Glossy effect that overlays the logo */
+.headerOverlay {
+	/* Uncomment the following statement if you don't want a glossy effect over your logo */
+	/* 	display: none ; */  	
+		z-index: 10;
+		background-color: transparent;		
+		background-image: url('img/overlay.png');
+		background-repeat: repeat-x;
+		border-bottom: 1px solid #CCCCCC;
+}
+.statusBar {
+		z-index: 5 ; 
+		width: 100%; height: 17px;  position: absolute; top: 43px;
+		background-color: #999999;
+		border-top : 1px solid #6F6F6F;
+		border-bottom: 1px solid #333333;
+		color: #000000;
+		font-size: 9pt;
+		text-shadow: 0px 1px 0px #CCCCCC;	
+		text-align: center;
+		-webkit-box-shadow: 0 0 5px 5px rgba(0,0,0,0.2);
+}
+
+#list {
+	margin-left: auto; margin-right:auto ;
+	text-align:center;
+	padding: 0px; padding-bottom: 4px;
+	overflow:auto;
+	padding: 2px 2px 4px 2px;
+}
+#list_container {
+	position:absolute;
+	width: 100%;
+	overflow-y:scroll;
+	top:62px;
+}
+
+.event,.reload { 
+	border-width: 2px solid #000000; 
+	-webkit-border-radius: 8px; border-radius: 8px; 
+	padding: 4px; margin-top: 2px; 
+	line-height: 14pt; text-align: left;
+}
+.event dl { margin-top: 0px; }
+.event dt { font-weight: bold; }
+.event dd { font-style: italic; margin-left: 30px; overflow: hidden; text-overflow: ellipsis; }
+.visibleifpressed {
+		margin-top: 4px;
+		background-color: #FFFFFF;
+		border: 1px solid #666666; -webkit-border-radius: 5px; 
+		padding: 3px; font-size: 10pt; line-height: 12pt;
+		font-style: normal;
+/*		background-image: url('img/bg.gif'); background-repeat: repeat;*/
+}
+.toolbar {	
+		z-index: 5;
+		width: 100%; height: 44px; position: absolute; 
+		background-image: url('img/toolbar_bg.png'); background-repeat: repeat-x; 
+		border-top: 1px solid #333333;
+		-webkit-box-shadow:  0 -5px 5px rgba(0,0,0,0.2);
+}
+.toolbar img {
+	margin-left: 20px;
+}
+.toolbar a.right { float: right; margin-right: 20px; }
+/* Portrait */
+/*@media screen and (max-width: 320px) {*/
+@media screen and (orientation:portrait) {
+	.container { height: 460px; }
+	#list { min-height: 350px; }
+	#list_container { height: 356px; }
+	.toolbar { top: 416px; }
+}
+
+/* Landscape */
+/*@media screen and (min-width: 321px) {*/
+@media screen and (orientation:landscape) {
+	.container { height: 300px; }
+	#list { min-height: 190px; }
+	#list_container { height: 196px; }
+	.toolbar {top: 256px; }
+}
+
+/* Events text elements */
+.device { font-weight: bold; color: #333333; overflow: hidden; text-overflow: ellipsis; }
+.info { font-size: 10pt; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.message { font-size: 8pt; }
+.count { }
+.location { font-size: 8pt; }
+
+
+.hide {
+	display: none;
+}
+.show {
+	display: block ; 
+}
+
+.event { border-width: 2px; }
+
+/* Messages Formating */
+.error_msg {
+	color: #FF0000;
+	font-weight: bold;
+}
+.noalarm {
+	padding-top: 30px;
+	height: 50px;
+	color: #000000;
+	font-weight: bold;
+	text-align: center;
+}
+
+/*#reload { z-index: 10; width: 250px; background-color: #F3C73D; -webkit-border-radius: 8px; border-radius: 8px; padding: 20px; padding-top:10px; margin: auto; margin-top: 2px; line-height: 50px; border: 2px solid #B59229; margin-top: 100px;  }*/
+
+/* EVENT SEVERITIES - the following is taken/adapted from zenoss code */
+.acked, .acked a, .acked a:visited, .acked a:link {
+	color: #333;
+	font-style:italic;
+}
+div
+.noack, .noack a, .noack a:visited, .noack a:link {
+	color: #000;
+}
+
+.zenevents_5_acked {
+	background-color: #f88880; 
+	background: -webkit-gradient(linear, left top, left bottom, from(#F88880), to(#D1736D));
+	border-color: #C85850;
+/*	text-shadow: 0.1em 0.1em #F88880; */
+}
+.zenevents_5_acked * {
+	color: #fee;
+}
+.zenevents_5_noack {
+	background-color: #e00;
+	background: -webkit-gradient(linear, left top, left bottom, from(#EE0000), to(#C70000));
+	border-color: #B00;
+}
+.zenevents_5_noack * {
+	color: #fff;
+}
+.zenevents_5_noack dd,
+.zenevents_5_noack dt,
+.zenevents_5_acked dt,
+.zenevents_5_acked dd {
+	 color: #000;
+}
+.zenevents_4_acked {
+	background-color: #ffba75;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ffba75), to(#D99E64));
+	border-color: #CF8a45;
+}
+
+.zenevents_4_noack {
+	background-color: #f82;
+	background: -webkit-gradient(linear, left top, left bottom, from(#FF8822), to(#D9741C));
+	border-color: #C50;
+}
+
+.zenevents_3_acked {
+	background-color: #fff280;
+	background: -webkit-gradient(linear, left top, left bottom, from(#fff280), to(#D9CE6C));
+	border-color: #CFC250;
+}
+
+.zenevents_3_noack {
+	background-color: #ffda00;
+	background: -webkit-gradient(linear, left top, left bottom, from(#ffda00), to(#D9B800));
+	border-color: #CF9A00;
+}
+
+.zenevents_2_acked {
+	background-color: #b3b3ff;
+	background: -webkit-gradient(linear, left top, left bottom, from(#b3b3ff), to(#9898D9));
+	border-color: #9393CF;
+}
+
+.zenevents_2_noack {
+	background-color: #56f;
+	background: -webkit-gradient(linear, left top, left bottom, from(#5566FF), to(#4856D9));
+	border-color: #2030C0;
+}
+
+.zenevents_1_acked {
+	background-color: #C8C8C8;
+	background: -webkit-gradient(linear, left top, left bottom, from(#C8C8C8), to(#A1A1A1));
+	border-color: #989898;
+}
+
+.zenevents_1_noack {
+	background-color: #AFAFAF;
+	background: -webkit-gradient(linear, left top, left bottom, from(#AFAFAF), to(#8A8A8A));
+	border-color: #7F7F7F;
+}
+
+.zenevents_0_acked, .reload {
+	background-color: #00CD00;
+	background: -webkit-gradient(linear, left top, left bottom, from(#00CD00), to(#00A600));
+	border-color: #009D00;
+	text-shadow: 0.1em 0.1em #6C6;
+	color: #060;	
+}
+
+.zenevents_0_noack {
+	background-color: #00FF00;
+	background: -webkit-gradient(linear, left top, left bottom, from(#00FF00), to(#00D900));
+	border-color: #00CF00;
+	text-shadow: 0.1em 0.1em #88CC88;
+}
+
+.zenevents_unknown_acked {
+	background-color: #CD00CD;
+	background: -webkit-gradient(linear, left top, left bottom, from(#CD00CD), to(#A600A6));
+}
+
+.zenevents_unknown_noack {
+	background-color: #D02090;
+	background: -webkit-gradient(linear, left top, left bottom, from(#D02090), to(#AB1A76));
+}
+
+.zenstatus_3 {
+	color: #000000;
+	background-color: #FF0000;
+}
+
+.zenstatus_2 {
+	color: #000000;
+	background-color: #ffb329;
+}
+
+.zenstatus_1 {
+	color: #000000;
+	background-color: #e2e200;
+}
+
+.zenstatus_0 {
+	background-color: #00FF00;
+}
+
+.zenstatus_unknown {
+	color: #000000;
+	background-color: #D02090;
+}
+
+.device, .info {
+	color: rgba(0,0,0,0.5);
+	text-shadow: 0.1em 0.1em rgba(255,255,255,0.3);
+
+}
+/* We use a less opaque hilight for level 3 (Yellow) so it looks ok */
+.zenevents_3_acked .device, .zenevents_3_acked .info, .zenevents_3_noack .device, .zenevents_3_noack .info, .reload {
+	text-shadow: 0.1em 0.1em rgba(255,255,255,0.5);
+}
+
+.reload {
+	color: #660;	background-color: #CDCD00;
+	background: -webkit-gradient(linear, left top, left bottom, from(#CDCD00), to(#A6A600));
+	font-weight: bold; text-align: center; padding:30px; border: 2px solid #9D9D00; margin:2px;
+}
+
+/* Setup section */
+#setup_page input, #setup_page select { font-size: 19pt;}
+#setup_page label { font-weight: bold; display: block; text-align: left; margin-top: 3px; width: 90%; }
+#setup_page input[type=text], #setup_page input[type=password] #setup_page option{ height: 40px; width: 90%; border: 1px solid #999999; -webkit-border-radius: 8px; padding: 2px; margin-top: 2px; }
+#setup_page input[type=submit] { font-weight: bold; width: 240px; -webkit-border-radius: 12px; margin-top: 20px; }

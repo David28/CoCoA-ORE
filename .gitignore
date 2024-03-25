@@ -4,6 +4,5 @@ SARD2_XSS/
 SARD_SQLI_Merged/
 *.csv
 WebApps/*
-WebAppsComplete/*
 
 Code/fastore/build/*
