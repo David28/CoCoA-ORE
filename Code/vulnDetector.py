@@ -2,7 +2,6 @@ from copy import copy
 import re
 from unittest import result
 from cripto import *  # decrypt_aes
-from matplotlib.pyplot import close
 from ds import *
 
 

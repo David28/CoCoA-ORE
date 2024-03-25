@@ -13,6 +13,9 @@ import pickle
 from lib.ore_wrapper import getInitiatedParams, OreVal
 from decryptor import decrypt_lineno
 from preprocessor import preprocess_php
+#perf counter to measure time more accurately
+from time import perf_counter
+
 Kd_key = "teste" #Deterministic master key
 Kr_key = "teste2" #Random master key
 
@@ -55,13 +58,14 @@ if __name__ == '__main__':
     filename = sys.argv[-1].split(".")[-2]
     input_data = file.read()
 
-    start_time = time.time()
+    start_time = time.perf_counter()
     if preprocess_flag:
         input_data = preprocess_php(input_data)
-        print("---Preprocessor %s seconds ---" % (time.time() - start_time))
-    start_time = time.time()
-    lexer.input(input_data)
+        end_time = time.perf_counter()
+        print("---Preprocessor %s seconds ---" % (end_time - start_time))
 
+    start_time = time.perf_counter()
+    lexer.input(input_data)
     lextokens = []
     while True:
         tok = lexer.token()
@@ -69,20 +73,23 @@ if __name__ == '__main__':
             break      # No more input
         lextokens.append(tok)
         #print(tok)
-    print("---Lexer %s seconds ---" % (time.time() - start_time))
-    start_time = time.time()
+    end_time = time.perf_counter()
+    print("---Lexer %s seconds ---" % (end_time - start_time))
+    start_time = time.perf_counter()
     # lextoken stream ==> intermediate language
     intermediate = translator.translate(lextokens)
     #print(*intermediate, sep='\n')
-    print("---Translator %s seconds ---" % (time.time() - start_time))
-    start_time = time.time()
+    end_time = time.perf_counter()
+    print("---Translator %s seconds ---" % (end_time - start_time))
+    start_time = time.perf_counter()
     # intermediate ==> data structure
     data = DataStructure()
     wrk = Worker(data, intermediate, Kd_key,Kr_key,ore_params) if flag else Worker(data,intermediate) 
     wrk.store(0)
     # print(data.data)
-    print("---Encryptor %s seconds ---" % (time.time() - start_time))
-    start_time = time.time()
+    end_time = time.perf_counter()
+    print("---Encryptor %s seconds ---" % (end_time - start_time))
+    start_time = time.perf_counter()
     vd = VulnerabilityDetector(data, Kd_key)
     
     with open("output.txt", "w") as f:
@@ -92,8 +99,8 @@ if __name__ == '__main__':
             results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), rnd_key)
         else:
             results = vd.detection(input, sens, sans)
-        print("---VD %s seconds ---" % (time.time() - start_time))
-        
+        end_time = time.perf_counter()
+        print("---VD %s seconds ---" % (end_time - start_time))
         for i in results:
             print(i)
         if decrypt_lines_flag:

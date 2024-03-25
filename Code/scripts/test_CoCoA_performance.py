@@ -34,19 +34,18 @@ def test_file(file_info,flags, timeout=5):
     return file_to_test, result, None
 
 def extract_performace_values(output):
-    #print("---Preprocessor %s seconds ---" % (time.time() - start_time))
     search = re.compile(r"---Preprocessor (.+) seconds ---")
     preprocessor_time = float(search.search(output).group(1)) *1000 if search.search(output) else None
-    # print("---Lexer %s seconds ---" % (time.time() - start_time))
+
     search = re.compile(r"---Lexer (.+) seconds ---")
     lexer_time = float(search.search(output).group(1))*1000 if search.search(output) else None
-    #print("---Translator %s seconds ---" % (time.time() - start_time))
+
     search = re.compile(r"---Translator (.+) seconds ---")
     translator_time = float(search.search(output).group(1))*1000 if search.search(output) else None
-    #print("---Encryptor %s seconds ---" % (time.time() - start_time))
+
     search = re.compile(r"---Encryptor (.+) seconds ---")
     encryptor_time = float(search.search(output).group(1))*1000 if search.search(output) else None
-    #print("---VD %s seconds ---" % (time.time() - start_time))
+
     search = re.compile(r"---VD (.+) seconds ---")
     vd_time = float(search.search(output).group(1))*1000 if search.search(output) else None
     
@@ -75,9 +74,7 @@ if __name__ == "__main__":
 
         results = []
         for file in php_files:
-            #clean stdout
-            sys.stdout.flush()
-            sys.stdout.write("\033[K")
+            
             count += 1
             avgs = []
             for i in range(run_count):
@@ -103,7 +100,9 @@ if __name__ == "__main__":
             #remove cientific notation and use comma as decimal separator
             rows.append(result)
             print(f"Tested file {count}/{len(php_files)}: {file[0]}", end="\r")
-
+            #clean stdout
+            sys.stdout.flush()
+            sys.stdout.write("\033[K")
         #group results by WebApp
         grouped = {}
         for result in rows[1:]:
