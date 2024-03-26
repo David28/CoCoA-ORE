@@ -58,12 +58,14 @@ if __name__ == '__main__':
     filename = sys.argv[-1].split(".")[-2]
     input_data = file.read()
 
+    # --- Preprocessor ---
     start_time = time.perf_counter()
     if preprocess_flag:
         input_data = preprocess_php(input_data)
         end_time = time.perf_counter()
         print("---Preprocessor %s seconds ---" % (end_time - start_time))
 
+    # --- Lexer ---
     start_time = time.perf_counter()
     lexer.input(input_data)
     lextokens = []
@@ -75,12 +77,17 @@ if __name__ == '__main__':
         #print(tok)
     end_time = time.perf_counter()
     print("---Lexer %s seconds ---" % (end_time - start_time))
+
+    # --- Translator ---
     start_time = time.perf_counter()
     # lextoken stream ==> intermediate language
     intermediate = translator.translate(lextokens)
     #print(*intermediate, sep='\n')
     end_time = time.perf_counter()
     print("---Translator %s seconds ---" % (end_time - start_time))
+
+    # --- Encryptor ---
+    # Create encypted index
     start_time = time.perf_counter()
     # intermediate ==> data structure
     data = DataStructure()
@@ -89,29 +96,31 @@ if __name__ == '__main__':
     # print(data.data)
     end_time = time.perf_counter()
     print("---Encryptor %s seconds ---" % (end_time - start_time))
+    
+    # --- Vulnerability Detection ---
     start_time = time.perf_counter()
     vd = VulnerabilityDetector(data, Kd_key)
-    
+    print(input,sens)
+    if (flag):
+        rnd_key = encrypt(Kr_key, sens)
+        results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), rnd_key)
+    else:
+        results = vd.detection(input, sens, sans)
+    end_time = time.perf_counter()
+    print("---VD %s seconds ---" % (end_time - start_time))
+    for i in results:
+        print(i)
+    if decrypt_lines_flag:
+        results = decrypt_lineno(results, ore_params[0],100)
+    if results:
+        print("Vulnerabilitys' path:")
+    for i in results:
+        print("* ",'->'.join(map(str,[x[1] for x in i])))
+    for i in range(len(results)):
+        for j in range(len(results[i])):
+            results[i][j] = tuple(str(x) for x in results[i][j])
+
     with open("output.txt", "w") as f:
-        print(input,sens)
-        if (flag):
-            rnd_key = encrypt(Kr_key, sens)
-            results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), rnd_key)
-        else:
-            results = vd.detection(input, sens, sans)
-        end_time = time.perf_counter()
-        print("---VD %s seconds ---" % (end_time - start_time))
-        for i in results:
-            print(i)
-        if decrypt_lines_flag:
-            results = decrypt_lineno(results, ore_params[0],100)
-        if results:
-            print("Vulnerabilitys' path:")
-        for i in results:
-            print("* ",'->'.join(map(str,[x[1] for x in i])))
-        for i in range(len(results)):
-           for j in range(len(results[i])):
-               results[i][j] = tuple(str(x) for x in results[i][j])
         f.write(json.dumps(results))
         f.close()
     
