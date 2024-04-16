@@ -24,7 +24,9 @@ To execute CoCoA, open a terminal inside the Code/ folder and execute the main.p
 > python3 main.py ../WebApps/currentcost_0/energy.php
 
 Use the flags:
+
     * To run encrypted use -e or --encrypt
+    
     * To run encrypted with ORE additionally use -o or --ore
 
 Example:
