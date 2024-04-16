@@ -26,11 +26,9 @@ def test_file(file_info):
         return file_to_test, result, safe
     return file_to_test, result, None
 
-if __name__ == "__main__":
-    info_xss = ("../Tests/SARD2_XSS/", ["-o", "-d", "-p"], "output_XSS.csv","output_XSS.csv")
-    info_sqli = ("../Tests/SARD_SQLI_Merged/", ["-s","-o", "-d", "-p"], "output_SQLi.csv", "output_SQLi.csv")
-    info = info_sqli if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_xss
 
+def test_vuln(info):
+    print("\n------------------------------------")
     files_dir, flags, output, csv_file = info_xss if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_sqli
 
     rows = []
@@ -87,3 +85,21 @@ if __name__ == "__main__":
     print("Precision: " + str(true_positives / (true_positives + false_positives) if true_positives + false_positives > 0 else 0))
     print("Recall: " + str(true_positives / (true_positives + false_negatives) if true_positives + false_negatives > 0 else 0))
     print("F1-score: " + str(2 * true_positives / (2 * true_positives + false_positives + false_negatives) if true_positives + false_positives + false_negatives > 0 else 0))
+    print("\n------------------------------------")
+
+if __name__ == "__main__":
+    info_xss = ("../Tests/SARD2_XSS/", ["-o", "-d", "-p"], "output_XSS.csv","output_XSS.csv")
+    info_sqli = ("../Tests/SARD_SQLI_Merged/", ["-s","-o", "-d", "-p"], "output_SQLi.csv", "output_SQLi.csv")
+
+    to_test = []
+    if "--xss" in sys.argv:
+        to_test.append(info_xss)
+    elif "--sqli" in sys.argv:
+        to_test.append(info_sqli)
+    else:
+        to_test.append(info_xss)
+        to_test.append(info_sqli)
+    for i in to_test:
+        test_vuln(i)
+
+    

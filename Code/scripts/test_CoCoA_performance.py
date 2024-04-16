@@ -16,9 +16,8 @@ info = [("performance.csv", ["-p"]), ("performance_e.csv", ["-e", "-p"]), ("perf
 def test_file(file_info,flags, timeout=5):
     # Unpack file_info
     file_to_test, files_dir = file_info
-
     result = file_to_test
-    if os.path.isfile(files_dir + file_to_test):
+    if os.path.isfile(file_to_test):
         # Get the output of the main.py with flags -o -d
         try:
             p = subprocess.run(["python3", "main.py"] + flags+ [file_to_test], capture_output=True, timeout=timeout)
@@ -106,7 +105,7 @@ if __name__ == "__main__":
         #group results by WebApp
         grouped = {}
         for result in rows[1:]:
-            app = result[0].split("/")[2]
+            app = result[0].split("/")[3]
             if app in grouped:
                 #sum the values
                 result = result 

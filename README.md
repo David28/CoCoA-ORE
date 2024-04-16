@@ -39,9 +39,11 @@ or
 
 Also checkout the test_CoCoA.py (synthethic dataset tests) and test_CoCoA_performance.py (real webapp tests) scripts in the Code/Scripts folder. Example:
 
+Test both vulnerabilities:
 > python3 scripts/test_CoCoA.py
->
+Or specify one:
 > python3 scripts/test_CoCoA.py --xss
+> python3 scripts/test_CoCoA.py --sqli
 > 
 > python3 scripts/test_CoCoA_performance.py
 
