@@ -39,11 +39,11 @@ or
 
 Also checkout the test_CoCoA.py (synthethic dataset tests) and test_CoCoA_performance.py (real webapp tests) scripts in the Code/Scripts folder. Example:
 
-python3 scripts/test_CoCoA.py
+> python3 scripts/test_CoCoA.py
 
 and
 
-python3 scripts/test_CoCoA_performance.py
+> python3 scripts/test_CoCoA_performance.py
 
 
 ### Dependencies
