@@ -21,7 +21,7 @@ Before trying to execute the tool make sure all the dependencies listed below ar
 
 To execute CoCoA, open a terminal inside the Code/ folder and execute the main.py file with the file you wish to verify as parameter. Example:
 
-> python3 main.py ../WebApps/currentcost_0/energy.php
+> python3 main.py ../Tests/Cases/Case1.php
 
 Use the flags:
 
@@ -31,11 +31,11 @@ Use the flags:
 
 Example:
 
-> python3 main.py -e ../WebApps/currentcost_0/energy.php
+> python3 main.py -e ../Tests/Cases/Case1.php
 
 or 
 
-> python3 main.py -e -o ../WebApps/currentcost_0/energy.php
+> python3 main.py -e -o ../Tests/Cases/Case1.php
 
 Also checkout the test_CoCoA.py (synthethic dataset tests) and test_CoCoA_performance.py (real webapp tests) scripts in the Code/Scripts folder. Example:
 
