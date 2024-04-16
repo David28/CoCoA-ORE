@@ -14,16 +14,37 @@ Download the .zip of the "Code" folder and extract it in your desired location.
 Before trying to execute the tool make sure all the dependencies listed below are installed in your system. Then run the setup script:
 
 > setup.sh
+> 
+> cd Code
+> 
+> source venv/bin/activate
 
 To execute CoCoA, open a terminal inside the Code/ folder and execute the main.py file with the file you wish to verify as parameter. Example:
 
-> python3 main.py testfile.php
+> python3 main.py ../WebApps/currentcost_0/energy.php
 
 Use the flags:
+
     * To run encrypted use -e or --encrypt
+    
     * To run encrypted with ORE additionally use -o or --ore
 
-> python3 main.py -e -o testfile.php
+Example:
+
+> python3 main.py -e ../WebApps/currentcost_0/energy.php
+
+or 
+
+> python3 main.py -e -o ../WebApps/currentcost_0/energy.php
+
+Also checkout the test_CoCoA.py (synthethic dataset tests) and test_CoCoA_performance.py (real webapp tests) scripts in the Code/Scripts folder. Example:
+
+> python3 scripts/test_CoCoA.py
+
+and
+
+> python3 scripts/test_CoCoA_performance.py
+
 
 ### Dependencies
 - Python3

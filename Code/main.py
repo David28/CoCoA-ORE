@@ -16,15 +16,17 @@ from preprocessor import preprocess_php
 #perf counter to measure time more accurately
 from time import perf_counter
 
-Kd_key = "teste" #Deterministic master key
-Kr_key = "teste2" #Random master key
+# Kd_key = "1234567891234567".encode("utf-8") #Deterministic master key
+# Kr_key = "9876543290293456".encode("utf-8") #Random master key
+Kd_key = "1234567891234567" #Deterministic master key
+Kr_key = "9876543290293456" #Random master key
 
 flag = False #Flag to run encryption or not 
 ore_params = None #ore depends on the flag -o
 xss_sens_flag = True
 decrypt_lines_flag = False
 preprocess_flag = False
-# Trata de tudo desde o .php até à estrutura de dados
+
 if __name__ == '__main__':
     #get flag from command line arguments
     for arg in sys.argv[1:-1]:

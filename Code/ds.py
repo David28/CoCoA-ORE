@@ -40,7 +40,6 @@ class MyValue(object):
     def _deserialize(self, text):
         a = text.split(";;")
         return MyValue(int(a[0]), int(a[1]), MyToken(a[2], int(a[3])), int(a[4]), int(a[5]))
-# PASSOU DE {KEY: {LINE: TOK}} PARA {KEY: [OBJ(LINE, DEPTH, TOK)]}
 
 
 class MyEncryptedValue(MyValue): #same as super class but with a random key and a deterministic key
