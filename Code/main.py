@@ -16,6 +16,8 @@ from preprocessor import preprocess_php
 #perf counter to measure time more accurately
 from time import perf_counter
 
+# Kd_key = "1234567891234567".encode("utf-8") #Deterministic master key
+# Kr_key = "9876543290293456".encode("utf-8") #Random master key
 Kd_key = "1234567891234567" #Deterministic master key
 Kr_key = "9876543290293456" #Random master key
 
