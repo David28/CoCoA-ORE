@@ -42,9 +42,7 @@ Also checkout the test_CoCoA.py (synthethic dataset tests) and test_CoCoA_perfor
 > python3 scripts/test_CoCoA.py
 >
 > python3 scripts/test_CoCoA.py --xss
-
-and
-
+> 
 > python3 scripts/test_CoCoA_performance.py
 
 
