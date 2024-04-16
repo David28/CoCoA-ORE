@@ -14,7 +14,9 @@ Download the .zip of the "Code" folder and extract it in your desired location.
 Before trying to execute the tool make sure all the dependencies listed below are installed in your system. Then run the setup script:
 
 > setup.sh
+> 
 > cd Code
+> 
 > source venv/bin/activate
 
 To execute CoCoA, open a terminal inside the Code/ folder and execute the main.py file with the file you wish to verify as parameter. Example:
