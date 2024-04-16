@@ -1,0 +1,22 @@
+Reasons for different labels:
+
+(Number in brackets is the total number of test cases in each reason)
+
+1 - URL-encoding (132) --> In SARD the functions that perform URL-encoding don't allow the writing of Javascript.
+    Marked as unsafe by SARD and safe by us;
+    
+2 - Quote escaping (72) --> (addslashes, mysql_real_escape_string, Filter magic quotes) Some SARD test cases that escape quotes are marked as safe and include the input inside quoted attribubes. We have found inputs that allow the execution of Javascript, thus making them unsafe;
+    (24) -> addslashes
+    (24) -> Filter magic quotes
+    (24) -> mysql_real_escape_string
+    
+3 - Ternary Condition (68) --> In SARD some test cases that use the ternary condition are marked as unsafe; They are safe;
+
+4 - Undefined constant (52) --> (checked_data) Some examples are marked as unsafe, but they are safe because they don't print any input;
+
+5 - Inclusion of input inside quoted CSS property values (28) --> Some examples that include input inside quoted CSS property values are marked as unsafe. We were unable to attack them, and marked them as safe; Did not include the ones already included in the categories above;
+
+6 - Inclusion of input inside of an HTML comment (16) --> (Only with htmlentities, htmlspecialchars, or their respective filters) --> Some examples include input inside of an HTML comment. SARD marks them as unsafe, but they are safe because it is not possible for an attacker to "exit" the comment.
+    (4) -> htmlspecialchars
+    (4) -> htmlentities
+    (8) -> filters

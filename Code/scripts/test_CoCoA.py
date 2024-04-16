@@ -27,8 +27,8 @@ def test_file(file_info):
     return file_to_test, result, None
 
 if __name__ == "__main__":
-    info_xss = ("../SARD2_XSS/", ["-o", "-d", "-p"], "output_XSS.csv","output_XSS.csv")
-    info_sqli = ("../SARD_SQLI_Merged/", ["-s","-o", "-d", "-p"], "output_SQLi.csv", "output_SQLi.csv")
+    info_xss = ("../Tests/SARD2_XSS/", ["-o", "-d", "-p"], "output_XSS.csv","output_XSS.csv")
+    info_sqli = ("../Tests/SARD_SQLI_Merged/", ["-s","-o", "-d", "-p"], "output_SQLi.csv", "output_SQLi.csv")
     info = info_sqli if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_xss
 
     files_dir, flags, output, csv_file = info_xss if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_sqli

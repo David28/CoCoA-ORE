@@ -1,8 +1,5 @@
 __pycache__/
 venv/
-SARD2_XSS/
-SARD_SQLI_Merged/
 *.csv
-WebApps/*
 
 Code/fastore/build/*
