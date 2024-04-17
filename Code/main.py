@@ -16,8 +16,7 @@ from preprocessor import preprocess_php
 #perf counter to measure time more accurately
 from time import perf_counter
 
-# Kd_key = "1234567891234567".encode("utf-8") #Deterministic master key
-# Kr_key = "9876543290293456".encode("utf-8") #Random master key
+#Kd_key = Random.new().read(AES.block_size)
 Kd_key = "1234567891234567" #Deterministic master key
 Kr_key = "9876543290293456" #Random master key
 
@@ -130,7 +129,7 @@ if __name__ == '__main__':
     data.data.pop("BASE_DEPTH", None)
     
     #convert everything to bytes
-    with open("filesize.txt", "wb") as f:
+    with open("index.txt", "wb") as f:
         pickle.dump(data.data, f)
 
  #wc -l

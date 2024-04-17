@@ -10,7 +10,7 @@ import re
 
 run_count = 5 #number of times to run each file
 master_dir = "../Tests/WebAppsComplete/"
-info = [("performance.csv", ["-p"]), ("performance_e.csv", ["-e", "-p"]), ("performance_o.csv", ["-o", "-p"])]
+info = [("../performance.csv", ["-p"]), ("../performance_e.csv", ["-e", "-p"]), ("../performance_o.csv", ["-o", "-p"])]
 
 
 def test_file(file_info,flags, timeout=5):
