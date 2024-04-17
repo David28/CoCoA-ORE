@@ -37,14 +37,17 @@ or
 
 > python3 main.py -e -o ../Tests/Cases/Case1.php
 
-Also checkout the test_CoCoA.py (synthethic dataset tests) and test_CoCoA_performance.py (real webapp tests) scripts in the Code/Scripts folder. Example:
+Also checkout the test_CoCoA.py and test_CoCoA_performance.py scripts in the Code/Scripts folder.
+
+Real webapp tests:
 
 > python3 scripts/test_CoCoA_performance.py
 
-Test both vulnerabilities:
+Synthethic dataset tests:
+
 > python3 scripts/test_CoCoA.py
 
-Or specify one:
+Or:
 > python3 scripts/test_CoCoA.py --xss
 > 
 > python3 scripts/test_CoCoA.py --sqli
