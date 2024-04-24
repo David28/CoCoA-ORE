@@ -29,7 +29,7 @@ def test_file(file_info):
 
 def test_vuln(info):
     print("\n------------------------------------")
-    files_dir, flags, output, csv_file = info_xss if len(sys.argv) >= 2 and sys.argv[1] == "--xss" else info_sqli
+    files_dir, flags, output, csv_file = info
 
     rows = []
 
