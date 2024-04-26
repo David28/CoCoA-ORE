@@ -126,40 +126,49 @@ class VulnerabilityDetector(object):
             # for i in range(1, max(len(x) for x in v)):
             #     for j in range(0, len(v)):z
             #         continue
-            # find closest path to vulnerabilitys' for each control flow
-            best_match = None
-            closests = {}
-            for i in range(1, max(len(x) for x in v)):
-                for j in range(0, len(v)):
-                    if i < len(v[j]):
-                        control_flow = ore_tuple((v[j][i][2],v[j][i][3],v[j][i][4]))
-                        if control_flow not in closests:
-                            closests[control_flow] = v[j], i
-                        else: 
-                            closest, token = closests[control_flow]
-                            if v[j][i][1] > closest[token][1] or i > token:
-                                closests[control_flow] = v[j], i
-            #print(closest)
-            #print(best_match)   
-            # print("_______________________")
-            # if best_match[0] in final:
-            #     final[best_match[0]].append(best_match)
-            # else:
-            #     final[best_match[0]] = best_match
-            for best_match, i in closests.values():
+            # find closest path to vulnerability
+            # group by control flows
+            # one group with every control flow
+            groups =  {None: v}
+            for i in v:
+                control_flows = []
+                for j in i:
+                    control_flows.append(ore_tuple((j[2], j[3], j[4])))
+                tup = tuple(control_flows)
+                if tup in groups:
+                    groups[tup].append(i)
+                else:
+                    groups[tup] = [i]
+            #Find the closest path for each of the sets
+            for k,path_set in groups.items():
+                best_match = None
+                discarted = set()
+                for i in range(1, max(len(x) for x in path_set)):
+                    closest = [None, 0]
+                    for j in range(0, len(path_set)):
+                        if j in discarted:
+                            continue
+                        if i < len(path_set[j]):
+                            if not closest[0]:
+                                closest[0] = path_set[j][i]
+                                best_match = path_set[j]
+                            elif path_set[j][i][1] > closest[0][1]:
+                                closest[0] = path_set[j][i]
+                                best_match = path_set[j]
+                                discarted.add(closest[1])
+                #print(closest)
+                # print("_______________________")
                 if best_match[0] in final:
-                    if best_match not in final[best_match[0]]:
-                        final[best_match[0]].append(best_match)
+                    final[best_match[0]].append(best_match)
                 else:
                     final[best_match[0]] = [best_match]
-        #######################################
-        
-        for _, k in final.items():
-            for v in k:
+        for path in final.values():
+            #######################################
+            for v in path:
                 myresult.append(v)
             accused = -1
             base_depth = self.ds.get("BASE_DEPTH")[0]
-            for i in k:
+            for i in path:
                 boolskip = True
                 for j in i:
                     if j[2] > base_depth: #TODO: With ORE need this encrypted base value, before it was only 0
@@ -207,6 +216,7 @@ class VulnerabilityDetector(object):
                     else:
                         aux.append(myresult[i])
             i += 1
+
 
         myresult = [x for x in myresult if x not in aux]
         myresult = [x for x in myresult if x[0] not in remall]
