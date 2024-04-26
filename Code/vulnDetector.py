@@ -100,10 +100,10 @@ class VulnerabilityDetector(object):
         group_by_vulns = {}
         myresult = []
 
-        # remove empty lists
+        # tirar listas vazias
         self.output = [x for x in self.output if x]
-        # group by vulnerabilities
-        # use special structure to be able to use probabilistic ORE
+        # agrupar por vulnerabilidades
+        # usar estrutura especial para poder usar ORE probabilistico
         for i in self.output:
             if ore_tuple(i[0]) in group_by_vulns:
                 group_by_vulns[ore_tuple(i[0])].append(i)
@@ -127,80 +127,62 @@ class VulnerabilityDetector(object):
             #     for j in range(0, len(v)):z
             #         continue
             # find closest path to vulnerability
-            # group by control flows
-            # one group with every control flow
-            groups =  {None: v}
-            for i in v:
-                control_flows = []
-                for j in i:
-                    control_flows.append(ore_tuple((j[2], j[3], j[4])))
-                tup = tuple(control_flows)
-                if tup in groups:
-                    groups[tup].append(i)
-                else:
-                    groups[tup] = [i]
-            #Find the closest path for each of the sets
-            for k,path_set in groups.items():
-                best_match = None
-                discarted = set()
-                for i in range(1, max(len(x) for x in path_set)):
-                    closest = [None, 0]
-                    for j in range(0, len(path_set)):
-                        if j in discarted:
-                            continue
-                        if i < len(path_set[j]):
-                            if not closest[0]:
-                                closest[0] = path_set[j][i]
-                                best_match = path_set[j]
-                            elif path_set[j][i][1] > closest[0][1]:
-                                closest[0] = path_set[j][i]
-                                best_match = path_set[j]
-                                discarted.add(closest[1])
-                #print(closest)
-                # print("_______________________")
-                if best_match[0] in final:
-                    final[best_match[0]].append(best_match)
-                else:
-                    final[best_match[0]] = [best_match]
-        for path in final.values():
-            #######################################
-            for v in path:
-                myresult.append(v)
-            accused = -1
-            base_depth = self.ds.get("BASE_DEPTH")[0]
-            for i in path:
-                boolskip = True
-                for j in i:
-                    if j[2] > base_depth: #TODO: With ORE need this encrypted base value, before it was only 0
-                        for loles in i[2:]:
-                            # if there is any atribution
-                            if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
-                                boolskip = False
-                        if boolskip:
-                            atual = group_by_vulns[ore_tuple(i[0])]
-                            # check if it's all outside control flow
-                            for verify in atual:
-                                allzero = True
+            best_match = None
+            for i in range(1, max(len(x) for x in v)):
+                closest = None
+                for j in range(0, len(v)):
+                    if i < len(v[j]):
+                        if not closest:
+                            closest = v[j][i]
+                            best_match = v[j]
+                        elif v[j][i][1] > closest[1]: #TODO: Confirmar se v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1] <=> v[j][i][1] > closest[1]
+                            closest = v[j][i]
+                            best_match = v[j]
+            #print(closest)
+            #print(best_match)   
+            # print("_______________________")
+            if best_match[0] in final:
+                final[best_match[0]].append(best_match)
+            else:
+                final[best_match[0]] = best_match
+        #######################################
+        for _, v in final.items():
+            myresult.append(v)
+        accused = -1
+        base_depth = self.ds.get("BASE_DEPTH")[0]
+        for _, i in final.items():
+            boolskip = True
+            for j in i:
+                if j[2] > base_depth: #TODO: Com ORE precisa-se de este valor base cifrado antes era só 0
+                    for loles in i[2:]:
+                        # se ha alguma atribuicao
+                        if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
+                            boolskip = False
+                    if boolskip:
+                        atual = group_by_vulns[ore_tuple(i[0])]
+                        # ver se eh tudo fora de control flow
+                        for verify in atual:
+                            allzero = True
+                            for token in verify:
+                                if token[2] != base_depth:
+                                    allzero = False
+                                    break
+                            if allzero:
+                                myresult.append(verify)
+                        for verify in atual:
+                            if verify != i:
                                 for token in verify:
-                                    if token[2] != base_depth:
-                                        allzero = False
-                                        break
-                                if allzero:
-                                    myresult.append(verify)
-                            for verify in atual:
-                                if verify != i:
-                                    for token in verify:
-                                        #if line nº is above
-                                        if token[1] <= j[1]:
-                                            if token[3] != j[3]:
-                                                myresult.append(verify)
-                                            elif token[3] == j[3] and token[4] != j[4]:
-                                                myresult.append(verify)
-                                            elif token[3] == j[3] and token[4] == j[4] and token[2] != j[2]:
-                                                myresult.append(verify)
-                        break
-        #analyse paths
-        #remove those that do not end in input
+                                    # se nmr de linha eh acima
+                                    if token[1] <= j[1]:
+                                        if token[3] != j[3]:
+                                            myresult.append(verify)
+                                        elif token[3] == j[3] and token[4] != j[4]:
+                                            myresult.append(verify)
+                                        elif token[3] == j[3] and token[4] == j[4] and token[2] != j[2]:
+                                            myresult.append(verify)
+                    break
+        # analisar caminhos
+        # tirar logo o q n acaba em input
         myresult = [x for x in myresult if x[-1][0] == start]
         # # other check and control flow
         remall = []
@@ -210,17 +192,16 @@ class VulnerabilityDetector(object):
             for j in myresult[i]:
                 if j[0] == sans:
                     vuln = myresult[i][0]
-                    # in this case the sanitization is in the same CF as the sens
+                    # neste caso a sanitization esta no mesmo cf q a e sens
                     if j[2] == vuln[2] and j[3] == vuln[3] and j[4] == vuln[4]:
                         remall.append(myresult[i][0])
                     else:
                         aux.append(myresult[i])
             i += 1
 
-
         myresult = [x for x in myresult if x not in aux]
         myresult = [x for x in myresult if x[0] not in remall]
-        # remove empty lists
+        # tirar lista vazias(pa ficar bonito)
         myresult = [x for x in myresult if x != []]
         finalresult = []
         for x in myresult:
@@ -228,18 +209,6 @@ class VulnerabilityDetector(object):
                 finalresult.append(x)
 
         return finalresult
-
-class Tree:
-    def __init__(self):
-        self.left = None
-        self.right = None
-        self.data = None
-    
-    def __eq__(self, __value: object) -> bool:
-        #if the data is the same, the trees are the same
-        if self.data == __value.data:
-            return True
-
 
 
 #hashable tuple that may contain probailistic ORE values
