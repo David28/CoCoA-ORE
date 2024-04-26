@@ -52,6 +52,7 @@ VULNS:
           "mysqli_escape_string",
           "mysqli_real_escape_string",
           "mysqli_stmt_bind_param",
+          "md5"
         ]
     },
   ]
