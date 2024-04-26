@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import re
 
 run_count = 5 #number of times to run each file
-master_dir = "../Tests/WebAppsComplete/"
+master_dir = "../Tests/WebApps/"
 info = [("../performance.csv", ["-p"]), ("../performance_e.csv", ["-e", "-p"]), ("../performance_o.csv", ["-o", "-p"])]
 
 

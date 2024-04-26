@@ -88,8 +88,8 @@ def test_vuln(info):
     print("\n------------------------------------")
 
 if __name__ == "__main__":
-    info_xss = ("../Tests/SARD2_XSS/", ["-o", "-d", "-p"], "output_XSS.csv","output_XSS.csv")
-    info_sqli = ("../Tests/SARD_SQLI_Merged/", ["-s","-o", "-d", "-p"], "output_SQLi.csv", "output_SQLi.csv")
+    info_xss = ("../Tests/SARD2_XSS/", ["-o", "-p"], "output_XSS.csv","output_XSS.csv")
+    info_sqli = ("../Tests/SARD_SQLI_Merged/", ["-s","-o", "-p"], "output_SQLi.csv", "output_SQLi.csv")
 
     to_test = []
     if "--xss" in sys.argv:

@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import re
 
 run_count = 5 #number of times to run each file
-master_dir = "../Tests/WebAppsComplete/"
+master_dir = "../Tests/WebApps/"
 
 def test_file(file_info,flags, timeout=5):
     # Unpack file_info
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         count += 1
         
         result = [file[0]]
-        for flags in [["-p", "-o", "-d"], ["-p", "-o", "-d", "--sqli"]]:
+        for flags in [["-p", "-o"], ["-p", "-o", "--sqli"]]:
             output = test_file(file, flags)
             classification = output[1]
             if output[1] != "Error":
