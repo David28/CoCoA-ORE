@@ -126,61 +126,70 @@ class VulnerabilityDetector(object):
             # for i in range(1, max(len(x) for x in v)):
             #     for j in range(0, len(v)):z
             #         continue
-            # find closest path to vulnerability
+            # find closest path to vulnerabilitys' for each control flow
             best_match = None
+            closests = {}
             for i in range(1, max(len(x) for x in v)):
-                closest = None
                 for j in range(0, len(v)):
                     if i < len(v[j]):
-                        if not closest:
-                            closest = v[j][i]
-                            best_match = v[j]
-                        elif v[j][i][1] > closest[1]: #TODO: Confirm if v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1] <=> v[j][i][1] > closest[1]
-                            closest = v[j][i]
-                            best_match = v[j]
+                        control_flow = ore_tuple((v[j][i][2],v[j][i][3],v[j][i][4]))
+                        if control_flow not in closests:
+                            closests[control_flow] = v[j], i
+                        else: 
+                            closest, token = closests[control_flow]
+                            if v[j][i][1] > closest[token][1] or i > token:
+                                closests[control_flow] = v[j], i
             #print(closest)
             #print(best_match)   
             # print("_______________________")
-            if best_match[0] in final:
-                final[best_match[0]].append(best_match)
-            else:
-                final[best_match[0]] = best_match
+            # if best_match[0] in final:
+            #     final[best_match[0]].append(best_match)
+            # else:
+            #     final[best_match[0]] = best_match
+            for best_match, i in closests.values():
+                if best_match[0] in final:
+                    if best_match not in final[best_match[0]]:
+                        final[best_match[0]].append(best_match)
+                else:
+                    final[best_match[0]] = [best_match]
         #######################################
-        for _, v in final.items():
-            myresult.append(v)
-        accused = -1
-        base_depth = self.ds.get("BASE_DEPTH")[0]
-        for _, i in final.items():
-            boolskip = True
-            for j in i:
-                if j[2] > base_depth: #TODO: With ORE need this encrypted base value, before it was only 0
-                    for loles in i[2:]:
-                        # if there is any atribution
-                        if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
-                            boolskip = False
-                    if boolskip:
-                        atual = group_by_vulns[ore_tuple(i[0])]
-                        # check if it's all outside control flow
-                        for verify in atual:
-                            allzero = True
-                            for token in verify:
-                                if token[2] != base_depth:
-                                    allzero = False
-                                    break
-                            if allzero:
-                                myresult.append(verify)
-                        for verify in atual:
-                            if verify != i:
+        
+        for _, k in final.items():
+            for v in k:
+                myresult.append(v)
+            accused = -1
+            base_depth = self.ds.get("BASE_DEPTH")[0]
+            for i in k:
+                boolskip = True
+                for j in i:
+                    if j[2] > base_depth: #TODO: With ORE need this encrypted base value, before it was only 0
+                        for loles in i[2:]:
+                            # if there is any atribution
+                            if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
+                                boolskip = False
+                        if boolskip:
+                            atual = group_by_vulns[ore_tuple(i[0])]
+                            # check if it's all outside control flow
+                            for verify in atual:
+                                allzero = True
                                 for token in verify:
-                                    #if line nº is above
-                                    if token[1] <= j[1]:
-                                        if token[3] != j[3]:
-                                            myresult.append(verify)
-                                        elif token[3] == j[3] and token[4] != j[4]:
-                                            myresult.append(verify)
-                                        elif token[3] == j[3] and token[4] == j[4] and token[2] != j[2]:
-                                            myresult.append(verify)
-                    break
+                                    if token[2] != base_depth:
+                                        allzero = False
+                                        break
+                                if allzero:
+                                    myresult.append(verify)
+                            for verify in atual:
+                                if verify != i:
+                                    for token in verify:
+                                        #if line nº is above
+                                        if token[1] <= j[1]:
+                                            if token[3] != j[3]:
+                                                myresult.append(verify)
+                                            elif token[3] == j[3] and token[4] != j[4]:
+                                                myresult.append(verify)
+                                            elif token[3] == j[3] and token[4] == j[4] and token[2] != j[2]:
+                                                myresult.append(verify)
+                        break
         #analyse paths
         #remove those that do not end in input
         myresult = [x for x in myresult if x[-1][0] == start]
@@ -209,6 +218,18 @@ class VulnerabilityDetector(object):
                 finalresult.append(x)
 
         return finalresult
+
+class Tree:
+    def __init__(self):
+        self.left = None
+        self.right = None
+        self.data = None
+    
+    def __eq__(self, __value: object) -> bool:
+        #if the data is the same, the trees are the same
+        if self.data == __value.data:
+            return True
+
 
 
 #hashable tuple that may contain probailistic ORE values
