@@ -49,7 +49,7 @@ def extract_performace_values(output):
     vd_time = float(search.search(output).group(1))*1000 if search.search(output) else None
     
     #disk usage by the encrypted index read the dump file size filesize.txt
-    filesize = os.path.getsize("filesize.txt")
+    filesize = os.path.getsize("index.txt")
     
     return preprocessor_time,lexer_time, translator_time, encryptor_time, vd_time, filesize
 if __name__ == "__main__":
