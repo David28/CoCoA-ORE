@@ -112,16 +112,23 @@ class VulnerabilityDetector(object):
 
         for k, v in group_by_vulns.items():
             # remove substitutions after vuln
-            for i in v:
-                lowest = i[0][1]
-                for j in i[1:]:
+            to_remove = set()
+            for i, path in enumerate(v):
+                lowest = path[0][1]
+                for j in path[1:]:
                     if j[1] > lowest:
                         try:
-                            v.remove(i)
+                            to_remove.add(i)
                         except:
                             pass
                     else:
                         lowest = j[1]
+            new_v = []
+            for i in range(len(v)):
+                if i not in to_remove:
+                    new_v.append(v[i])
+            v = new_v
+            group_by_vulns[k] = v
             # depth checker
             # for i in range(1, max(len(x) for x in v)):
             #     for j in range(0, len(v)):z
@@ -129,7 +136,7 @@ class VulnerabilityDetector(object):
             # find closest path to vulnerability
             # group by control flows
             # one group with every control flow
-            groups =  {None: v}
+            groups =  {}
             for i in v:
                 control_flows = []
                 for j in i:
@@ -139,24 +146,27 @@ class VulnerabilityDetector(object):
                     groups[tup].append(i)
                 else:
                     groups[tup] = [i]
+            
             #Find the closest path for each of the sets
             for k,path_set in groups.items():
                 best_match = None
                 discarted = set()
                 for i in range(1, max(len(x) for x in path_set)):
-                    closest = [None, 0]
+                    closest = None, None
                     for j in range(0, len(path_set)):
                         if j in discarted:
                             continue
                         if i < len(path_set[j]):
                             if not closest[0]:
-                                closest[0] = path_set[j][i]
+                                closest = path_set[j][i], j
                                 best_match = path_set[j]
-                            elif path_set[j][i][1] > closest[0][1]:
-                                closest[0] = path_set[j][i]
+                            elif path_set[j][i][1] > closest[0][1] or (path_set[j][i][1] == closest[0][1] and path_set[j][i][0] == start and closest[0][0] != sans):
+                                if path_set[closest[1]][-1][0] != start :
+                                    discarted.add(closest[1])
+                                closest = path_set[j][i], j
                                 best_match = path_set[j]
-                                discarted.add(closest[1])
                 #print(closest)
+                #print(best_match)
                 # print("_______________________")
                 if best_match[0] in final:
                     final[best_match[0]].append(best_match)
