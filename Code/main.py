@@ -23,7 +23,6 @@ Kr_key = "9876543290293456" #Random master key
 flag = False #Flag to run encryption or not 
 ore_params = None #ore depends on the flag -o
 xss_sens_flag = True
-decrypt_lines_flag = False
 preprocess_flag = False
 
 if __name__ == '__main__':
@@ -36,8 +35,6 @@ if __name__ == '__main__':
             ore_params = [getInitiatedParams() for _ in range(4)]
         elif arg == "-s" or arg == "--sqli":
             xss_sens_flag = False
-        elif arg == "-d" or arg == "--decrypt":
-            decrypt_lines_flag = True
         elif arg == "-p" or arg == "--preprocess":
             preprocess_flag = True
         else:
@@ -111,12 +108,13 @@ if __name__ == '__main__':
     print("---VD %s seconds ---" % (end_time - start_time))
     for i in results:
         print(i)
-    if decrypt_lines_flag:
+    if ore_params != None:
         results = decrypt_lineno(results, ore_params[0],100)
     if results:
         print("Vulnerabilitys' path:")
     for i in results:
-        print("* ",'->'.join(map(str,[x[1] for x in i])))
+        # print the path from input to sensitive link without duplicates
+        print("* ",'->'.join(map(str,list(dict.fromkeys([x[1] for x in i]))[::-1])))
     for i in range(len(results)):
         for j in range(len(results[i])):
             results[i][j] = tuple(str(x) for x in results[i][j])
