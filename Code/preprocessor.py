@@ -24,7 +24,8 @@ var_pattern = r'(?:(?:\$\w+)|(?:[\",\']\w+[\",\'])|(?:\w+\(.+\)))'
 #turn this (int) 5; into intval(5);
 def convert_explicit_cast_to_function(php_code): 
     #int, float, string, bool, array, object
-    pattern = r'$\w+\s*(?=\(\s*(int|float|string|bool)\s*\)).+;'
+    pattern = r'(\((?:int|float|string|bool)\))\s*(.*)\s*;'
+
     if not re.compile(pattern).search(php_code):
         return php_code
     cast_pattern = r'\(\s*(int|float|string|bool)\s*\)'
