@@ -52,7 +52,11 @@ VULNS:
           "mysqli_escape_string",
           "mysqli_real_escape_string",
           "mysqli_stmt_bind_param",
-          "md5"
+          "md5",
+
+          # If looking for XSS vulnerabilities, comment out the following lines and uncomment the ones above and vice versa
+          #"intval",
+          #"floatval",
         ]
     },
   ]
