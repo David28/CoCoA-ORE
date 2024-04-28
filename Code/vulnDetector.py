@@ -191,7 +191,7 @@ class VulnerabilityDetector(object):
             for i in path:
                 boolskip = True
                 for j in i:
-                    if j[2] > base_depth: #TODO: With ORE need this encrypted base value, before it was only 0
+                    if j[2] > base_depth: 
                         for loles in i[2:]:
                             # if there is any atribution
                             if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
