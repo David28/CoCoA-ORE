@@ -100,10 +100,7 @@ class VulnerabilityDetector(object):
         group_by_vulns = {}
         myresult = []
 
-        # tirar listas vazias
         self.output = [x for x in self.output if x]
-        # agrupar por vulnerabilidades
-        # usar estrutura especial para poder usar ORE probabilistico
         for i in self.output:
             if ore_tuple(i[0]) in group_by_vulns:
                 group_by_vulns[ore_tuple(i[0])].append(i)
@@ -135,7 +132,7 @@ class VulnerabilityDetector(object):
                         if not closest:
                             closest = v[j][i]
                             best_match = v[j]
-                        elif v[j][i][1] > closest[1]: #TODO: Confirmar se v[0][0][1] - v[j][i][1] < v[0][0][1] - closest[1] <=> v[j][i][1] > closest[1]
+                        elif v[j][i][1] > closest[1]:
                             closest = v[j][i]
                             best_match = v[j]
             #print(closest)
@@ -153,9 +150,8 @@ class VulnerabilityDetector(object):
         for _, i in final.items():
             boolskip = True
             for j in i:
-                if j[2] > base_depth: #TODO: Com ORE precisa-se de este valor base cifrado antes era só 0
+                if j[2] > base_depth: 
                     for loles in i[2:]:
-                        # se ha alguma atribuicao
                         if loles[2] == i[0][2] and loles[3] == i[0][3] and loles[4] == i[0][4]:
                             boolskip = False
                     if boolskip:
@@ -181,8 +177,6 @@ class VulnerabilityDetector(object):
                                         elif token[3] == j[3] and token[4] == j[4] and token[2] != j[2]:
                                             myresult.append(verify)
                     break
-        # analisar caminhos
-        # tirar logo o q n acaba em input
         myresult = [x for x in myresult if x[-1][0] == start]
         # # other check and control flow
         remall = []
@@ -192,7 +186,6 @@ class VulnerabilityDetector(object):
             for j in myresult[i]:
                 if j[0] == sans:
                     vuln = myresult[i][0]
-                    # neste caso a sanitization esta no mesmo cf q a e sens
                     if j[2] == vuln[2] and j[3] == vuln[3] and j[4] == vuln[4]:
                         remall.append(myresult[i][0])
                     else:
@@ -201,7 +194,6 @@ class VulnerabilityDetector(object):
 
         myresult = [x for x in myresult if x not in aux]
         myresult = [x for x in myresult if x[0] not in remall]
-        # tirar lista vazias(pa ficar bonito)
         myresult = [x for x in myresult if x != []]
         finalresult = []
         for x in myresult:
