@@ -45,7 +45,7 @@ Real webapp tests:
 
 Synthethic dataset tests:
 
-> python3 scripts/test_CoCoA.py --xss
+> python3 scripts/test_CoCoA.py
 
 
 
