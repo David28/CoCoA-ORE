@@ -41,6 +41,8 @@ Also checkout the test_CoCoA.py and test_CoCoA_performance.py scripts in the Cod
 
 Real webapp tests:
 
+> python3 scripts/gather_CoCoA_Output.py
+
 > python3 scripts/test_CoCoA_performance.py
 
 Synthethic dataset tests:
