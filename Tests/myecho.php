@@ -1,11 +1,18 @@
 <?php
 
-$tainted = $_GET['UserData'];
-myecho($tainted, "heu");
+echo "s";
+$a = $_GET['UserData'];
+echo $_GET['UserData'];
 
-function myecho($tainted, $b)
-{
-  echo $tainted ;
-}
+
+
+echo $a;
+// $tainted = $_GET['UserData'];
+// myecho($tainted, "heu");
+
+// function myecho($tainted, $b)
+// {
+//   echo $tainted ;
+// }
 
 ?>
