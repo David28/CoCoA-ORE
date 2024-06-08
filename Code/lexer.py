@@ -123,6 +123,7 @@ def t_STRING_LITERAL(t):
     except ValueError:
         print("Not a string %s", t.value)
         t.value = ""
+    t.lexer.lineno += t.value.count("\n")
     return t
 
 
@@ -159,7 +160,6 @@ def t_VAR(t):
     elif t.value[0] != '$' and t.type == 'VAR':
         t.type = 'FUNC_CALL'
         return t
-
     return t
 
 

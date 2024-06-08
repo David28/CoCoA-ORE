@@ -3,22 +3,64 @@ import sys
 #Extract php snippets only from the code and convert explicit casts to functions
 # so that they can be recognized by cocoa as sanitization functions
 cast_pattern = re.compile(r'\(\s*(int|float|string|bool)\s*\)')
-def preprocess_php(input_data):
-    #replace all non php code with blanks
-    in_php = False
-    result = ""
-    for line in input_data.split("\n"):
-        output = line
-        if re.compile(r'(<\s*\?\s*php)|(<\s*\?\s*PHP)').search(line):
-            in_php = True
-        if not in_php:
-            output = ""
-        if re.compile(r'\?\s*>').search(line):
-            in_php = False
-        if re.compile(r'\$\w+\s*').match(output):
-            output = preprocess_casts(output)
-        result += output + "\n"
-    return result
+php_tag_pattern = re.compile(r'((?:<\?php)|(?:<\?PHP)|(?:<\?=))(.*?)($|(?:\?>))')
+php_end_tag_pattern = re.compile(r'()(.*?)(?:$|(\?>))')
+class Preprocessor:
+    def __init__(self):
+        self.offset = {}
+
+
+
+    def preprocess_php(self, input_data):
+        #replace all non php code with blanks
+        in_php = False
+        result = "<?php\n"
+        self.offset = {1:0}
+        current_line = 1
+        current_offset = 1
+        for line in input_data.split("\n"):
+            current_line += 1
+            self.offset[current_line] = current_line - current_offset
+            output = line
+            #find all matches
+            matches = php_tag_pattern.findall(line)
+            if in_php:
+                #there was a tag still open
+                potential_end = php_end_tag_pattern.search(line)
+                if potential_end:
+                    #append at the start
+                    matches = [potential_end.groups()] + matches
+            new_line = ""
+            for match in matches:
+                code = match[1]
+                add_new_line = False
+                if match[0] == "<?=":
+                    code = "echo "+code + ";"
+                    add_new_line = True
+                if re.compile(r'\$\w+\s*').match(code):
+                    code = preprocess_casts(code)
+                new_line += code
+                if add_new_line:
+                    current_line += 1
+                    current_offset += 1
+                    new_line += "\n"
+                    self.offset[current_line] = current_line - current_offset
+                if match[2] == "?>":
+                    in_php = False
+                else:
+                    in_php = True
+            if len(matches) == 0 and in_php:
+                code = line 
+                if re.compile(r'\$\w+\s*').match(code):
+                    code = preprocess_casts(code)
+                new_line += code
+            output = new_line
+            result += output + "\n"
+        return result + "?>"
+
+    def get_original_line(self, line):
+        return self.offset[line]
+
 var_pattern = r'(?:(?:\$\w+)|(?:[\",\']\w+[\",\'])|(?:\w+\(.+\)))'
 
 #turn this (int) 5; into intval(5);

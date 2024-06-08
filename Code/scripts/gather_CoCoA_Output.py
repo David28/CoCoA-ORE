@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import re
 
 run_count = 5 #number of times to run each file
-master_dir = "../Tests/WebApps/"
+master_dir = "../Tests/WebAppsComplete/"
 
 def test_file(file_info,flags, timeout=5):
     # Unpack file_info
@@ -45,6 +45,8 @@ if __name__ == "__main__":
     print("Testing files in: ", master_dir)
     results = []
     count = 0
+    total_xss_vuln = 0 
+    total_sqli_vuln = 0
     for file in php_files:
         count += 1
         
@@ -54,6 +56,10 @@ if __name__ == "__main__":
             classification = output[1]
             if output[1] != "Error":
                 classification = "true" if "Vulnerabilitys" in output[1] else "false"
+                if len(flags) == 3:
+                    total_sqli_vuln += output[1].count('*') if classification == "true" else 0 
+                else:
+                    total_xss_vuln += output[1].count('*') if classification == "true" else 0
             result += [classification, output[1]]
 
         rows.append(result)
@@ -61,6 +67,7 @@ if __name__ == "__main__":
         #clean stdout
         sys.stdout.flush()
         sys.stdout.write("\033[K")
+
     #group results by WebApp
     grouped = {}
     for result in rows:
@@ -79,4 +86,5 @@ if __name__ == "__main__":
             writer.writerows(grouped[key])
             f.close()            
     print("Total files found: " + str(count))
-   
+    print("Total XSS vulnerabilities found: " + str(total_xss_vuln))
+    print("Total SQLi vulnerabilities found: " + str(total_sqli_vuln))

@@ -12,7 +12,7 @@ import time
 import pickle
 from lib.ore_wrapper import getInitiatedParams, OreVal
 from decryptor import decrypt_lineno
-from preprocessor import preprocess_php
+from preprocessor import Preprocessor
 #perf counter to measure time more accurately
 from time import perf_counter
 
@@ -27,6 +27,7 @@ preprocess_flag = False
 
 if __name__ == '__main__':
     #get flag from command line arguments
+    preprocessor = None
     for arg in sys.argv[1:-1]:
         if arg == "-e" or arg == "--encrypt":
             flag = True
@@ -36,7 +37,7 @@ if __name__ == '__main__':
         elif arg == "-s" or arg == "--sqli":
             xss_sens_flag = False
         elif arg == "-p" or arg == "--preprocess":
-            preprocess_flag = True
+            preprocessor = Preprocessor()
         else:
             print("Unrecognized argument: " + arg)
 
@@ -58,11 +59,10 @@ if __name__ == '__main__':
 
     # --- Preprocessor ---
     start_time = time.perf_counter()
-    if preprocess_flag:
-        input_data = preprocess_php(input_data)
+    if preprocessor:
+        input_data = preprocessor.preprocess_php(input_data)
         end_time = time.perf_counter()
         print("---Preprocessor %s seconds ---" % (end_time - start_time))
-
     # --- Lexer ---
     start_time = time.perf_counter()
     lexer.input(input_data)
@@ -110,6 +110,20 @@ if __name__ == '__main__':
         print(i)
     if ore_params != None:
         results = decrypt_lineno(results, ore_params[0],100)
+    
+    #convert the lines to the original line numbers
+    if preprocessor:
+        updated_results = []
+        for i in results:
+            updated_i = []
+            for j in i:
+                j = list(j)
+                j[1] = preprocessor.get_original_line(j[1])
+                updated_i.append(tuple(j))
+            updated_results.append(updated_i)
+        results = updated_results
+
+    
     if results:
         print("Vulnerabilitys' path:")
     for i in results:
