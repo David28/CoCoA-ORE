@@ -63,6 +63,7 @@ if __name__ == '__main__':
         input_data = preprocessor.preprocess_php(input_data)
         end_time = time.perf_counter()
         print("---Preprocessor %s seconds ---" % (end_time - start_time))
+    #print(input_data)
     # --- Lexer ---
     start_time = time.perf_counter()
     lexer.input(input_data)

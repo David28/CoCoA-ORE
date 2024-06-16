@@ -31,7 +31,11 @@ keywords = {
     'return': 'RETURN',
     'php': 'PHP',
     'function': 'FUNC',
+    # Classes
     'class': 'CLASS',
+    'public': 'PUBLIC',
+    'private': 'PRIVATE',
+
 }
 
 

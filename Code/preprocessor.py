@@ -102,14 +102,14 @@ def convert_sum_cast_to_function(php_code):
     match = re.compile(whole_pattern).search(php_code)
     new_code = php_code
     if match:
-        print(match)
+        #print(match)
         #get full match 
         #find int or float
         digit = re.compile(r'(\d+(\.\d+)?)').search(php_code).group(1)
         assign =  re.compile(r'(?:[\+\-\*\/\%]\s*)?\=\s*.*\s*;').search(php_code).group(0)
         new_assign = assign
 
-        assign_left = re.compile(r"(?:[\+\-\*\/\%]\s*)?(\=\s*)(\s*.*\s*)"+digit).search(php_code)
+        assign_left = re.compile(r'(?:[\+\-\*\/\%]\s*)?(\=\s*)(\s*.*\s*)'+digit).search(php_code)
         if assign_left:
             assign_left = assign_left.group(2)
             vars = re.compile(var_pattern).findall(assign_left)

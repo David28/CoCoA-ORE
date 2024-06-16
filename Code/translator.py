@@ -57,7 +57,9 @@ class Translator(object):
         ignore = {'LPAREN', 'RPAREN',
                   'LBRACE', 'RBRACE',
                   'LBRACKET', 'RBRACKET',
-                  'SEMI', 'COLON', 'COMMA'}
+                  'SEMI', 'COLON',
+                  #'COMMA'
+                  }
         ops = [
             'EQUALS', 'CONCAT',
             'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'MOD',
@@ -79,7 +81,7 @@ class Translator(object):
         in_func = None # to store the name of the function definition we are in
         while i < len(lextokens):
             tok = lextokens[i]
-            #print(tok)
+            #print(tok, call, assign)
             # ignorar parametros passados numa entrypoint
             if tok.type == "INPUT" and lextokens[i+1].type == "LPAREN":
                 del lextokens[i+1]
@@ -111,6 +113,10 @@ class Translator(object):
                 funcname = lextokens[i+1]
                 if funcname.value not in func:
                     func.append(funcname.value)
+                
+                # append token to indicate a function definition
+                mytokens.append(MyToken("BEGINFUNCDEF", tok.lineno))
+
                 mytokens.append(
                     MyToken("FUNC"+str(func.index(funcname.value)), funcname.lineno))
                 del lextokens[i+1]
@@ -203,13 +209,13 @@ class Translator(object):
                     MyToken("DEFAULT", tok.lineno))
 
             elif tok.type == "FUNC_CALL":
-                call = 1
+                call += 1
                 if tok.value not in func:
                     func.append(tok.value)
                 mytokens.append(
                     MyToken("FUNC"+str(func.index(tok.value)), tok.lineno))
             elif _findSans(tok) or _findSens(tok):
-                call = 1
+                call += 1
                 mytokens.append(
                     MyToken(tok.type, tok.lineno))
             elif tok.type == "RBRACE":
@@ -218,27 +224,34 @@ class Translator(object):
                 mytokens.append(
                     MyToken(bracecount.pop(), tok.lineno))
             elif tok.type == "RPAREN":
-                if call == 1:
+                if call >= 1:
                     mytokens.append(
                         MyToken("END_CALL", tok.lineno))
-                    call = 0
+                    call -= 1
                 elif cond == 1:
                     mytokens.append(
                         MyToken("END_COND", tok.lineno))
                     cond = 0
+                elif in_func:
+                    mytokens.append(MyToken("ENDFUNCDEF", tok.lineno))
             elif tok.type == "SEMI":
-                if call == 1:
+                if call >= 1:
                     mytokens.append(
                         MyToken("END_CALL", tok.lineno))
-                    call = 0
-                elif assign == 1:
+                    call -= 1
+                if assign == 1:
                     assign = 0
                     mytokens.append(
                         MyToken("END_ASSIGN", tok.lineno))
+            elif tok.type == "COMMA":
+                if call >= 1:
+                    mytokens.append(
+                        MyToken("NEXT_ARG", tok.lineno))
             elif tok.type == "CLASS":
                 bracecount.append("ENDCLASS")
                 mytokens.append(
                     MyToken("CLASS", tok.lineno))
+                i += 1 #TODO: skip class name, needs func treatment
                 #TODO: Fix class logic, this is just a placeholder to reduce errors
             elif tok.type in ignore:
                 pass

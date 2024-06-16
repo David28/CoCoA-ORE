@@ -37,7 +37,7 @@ class Worker(object):
         self.ds = ds
         self.tokenstream = tokenstream
         #print("\nTokenstream: ", tokenstream)
-        self.counter = {}    
+        self.counter = {}
         
         self.next = 0
         self.order = [0]
@@ -50,6 +50,7 @@ class Worker(object):
         else:
             self.ds.put("BASE_DEPTH", 0)
         self.inFunction = [] #stack of function we are in
+        self.funcCalls = {} #args and calls 
 
     def store(self, depth):
         if self.next >= len(self.tokenstream):
@@ -62,6 +63,8 @@ class Worker(object):
                 self.next += 2
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_ASSIGN" :
+                    if _isFunc(curr.type):
+                        self.handle_func_call(curr, depth)
                     if curr.type == "FUNC_CALL" or _isSens(curr.type) or _isSans(curr.type):
                         self.next += 1
                         dummie = self.tokenstream[self.next]
@@ -70,7 +73,7 @@ class Worker(object):
                                 self.create_entry(curr, dummie, curr.lineno, depth, self.order[depth], self.type)
                             self.next += 1
                             dummie = self.tokenstream[self.next]
-                    if not _isOP(curr.type):
+                    if not _isOP(curr.type) and curr.type != "END_ASSIGN" and curr.type != "END_CALL":
                         self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
                     
                     self.next += 1
@@ -85,8 +88,33 @@ class Worker(object):
                         self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
                     self.next += 1
                     curr = self.tokenstream[self.next]
-            elif _isFunc(curr.type):
-                self.inFunction.append(curr)
+            elif curr.type == "BEGINFUNCDEF": #handle function definition 
+                self.next += 1
+                curr = self.tokenstream[self.next]
+                func = curr
+                funcname = func.type
+                self.next += 1
+                curr = self.tokenstream[self.next]
+                while curr.type != "ENDFUNCDEF":
+                    if funcname not in self.funcCalls: 
+                        self.funcCalls[funcname] = {
+                            "args": [],
+                            "calls": []
+                        }
+                    self.funcCalls[funcname]["args"].append(curr)
+                    #print("FuncCalls: ", self.funcCalls)
+                    self.next += 1
+                    curr = self.tokenstream[self.next]
+                self.inFunction.append(func)
+                #check if there were already calls to this function 
+                if funcname in self.funcCalls:
+                    for arg in self.funcCalls[funcname]["args"]:
+                        if len(self.funcCalls[funcname]["calls"]) > 0:
+                            call = self.funcCalls[funcname]["calls"].pop(0)
+                            for call_i in call:
+                                self.create_entry(arg, call_i, call_i.lineno, depth, self.order[depth], self.type)
+            elif _isFunc(curr.type): #function calls without caring for return value 
+                self.handle_func_call(curr, depth)
             elif curr.type == "RETURN" and len(self.inFunction) > 0:
                 self.next += 1
                 curr = self.tokenstream[self.next]
@@ -127,6 +155,35 @@ class Worker(object):
                 return
         self.next += 1
         self.store(depth)
+
+    def handle_func_call(self, curr, depth):
+        self.inFunction.append(curr)
+        funcname = curr.type
+        if funcname not in self.funcCalls:
+            self.funcCalls[funcname] = {
+                        "args": [],
+                        "calls": []
+                    }
+
+        self.next += 1 
+        curr = self.tokenstream[self.next]
+        current_arg = 0
+        while curr.type != "END_CALL":
+            if curr.type == "NEXT_ARG":
+                current_arg += 1
+                self.next += 1
+                curr = self.tokenstream[self.next]
+
+            if len(self.funcCalls[funcname]["args"]) > current_arg:
+                self.create_entry(self.funcCalls[funcname]["args"][current_arg], curr, curr.lineno, depth, self.order[depth], self.type)
+            else:
+                if len(self.funcCalls[funcname]["calls"]) <= current_arg:
+                    self.funcCalls[funcname]["calls"].append([])
+                self.funcCalls[funcname]["calls"][current_arg].append(curr)
+            if _isFunc(curr.type):
+                self.handle_func_call(curr, depth)
+            self.next += 1 
+            curr = self.tokenstream[self.next]
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
     def create_entry(self, key_ind, val_ind, lineno, depth, order, type):

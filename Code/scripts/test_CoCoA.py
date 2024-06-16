@@ -19,7 +19,7 @@ def test_file(file_info):
         
         if p.returncode != 0:
             result = "Error"
-            
+            print("Error in file: ", file_to_test) 
         else:
             result = p.stdout.decode('utf-8').rstrip('\n')
 
