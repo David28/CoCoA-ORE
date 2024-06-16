@@ -81,7 +81,7 @@ class Translator(object):
         in_func = None # to store the name of the function definition we are in
         while i < len(lextokens):
             tok = lextokens[i]
-            #print(tok, call, assign)
+            #print(tok, call, assign, cond)
             # ignorar parametros passados numa entrypoint
             if tok.type == "INPUT" and lextokens[i+1].type == "LPAREN":
                 del lextokens[i+1]
@@ -209,11 +209,16 @@ class Translator(object):
                     MyToken("DEFAULT", tok.lineno))
 
             elif tok.type == "FUNC_CALL":
-                call += 1
-                if tok.value not in func:
-                    func.append(tok.value)
-                mytokens.append(
-                    MyToken("FUNC"+str(func.index(tok.value)), tok.lineno))
+                if i + 1 < len(lextokens) and lextokens[i+1].type == "LPAREN":
+                    call += 1
+                    if tok.value not in func:
+                        func.append(tok.value)
+                    mytokens.append(
+                        MyToken("FUNC"+str(func.index(tok.value)), tok.lineno))
+                else: #assume it's a constant
+                    mytokens.append(
+                        MyToken("CONST", tok.lineno))
+
             elif _findSans(tok) or _findSens(tok):
                 call += 1
                 mytokens.append(

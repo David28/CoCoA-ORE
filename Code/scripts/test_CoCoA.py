@@ -46,6 +46,7 @@ def test_vuln(info):
     count = 0
     error_count = 0
     true_positives, false_positives, true_negatives, false_negatives = 0, 0, 0, 0
+    wrong_results = ([],[])
     for i, (file_to_test, result, safe) in enumerate(results):
         if safe is None:
             continue
@@ -59,6 +60,7 @@ def test_vuln(info):
         if "Vulnerabilitys" in result:
             if safe:
                 false_positives += 1
+                wrong_results[0].append(file_to_test)
             else:
                 true_positives += 1
         else:
@@ -66,10 +68,16 @@ def test_vuln(info):
                 true_negatives += 1
             else:
                 false_negatives += 1
+                wrong_results[1].append(file_to_test)
 
     with open(output, 'w') as file:
         csv_writer = csv.writer(file)
         csv_writer.writerows(rows)
+    with open(output.replace('.csv','.txt'), 'w') as file:
+        file.write("False positives:\n")
+        file.write("\n".join(wrong_results[0]))
+        file.write("\n\nFalse negatives:\n")
+        file.write("\n".join(wrong_results[1]))
     print()
     print("Total files found: " + str(count))
     print("Error count: " + str(error_count))
