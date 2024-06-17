@@ -19,9 +19,9 @@ class VulnerabilityDetector(object):
         #         print("Warning: Multiple values for key " + k)
 
     #depth first search sse
-    def sse_search(self,end, start, cur_rndkey, line=None, flow=0, order=0, type=0):
+    def sse_search(self,end, start, cur_rndkey, line=None, flow=0, order=0, type=0, scope=None):
         if line:
-            self.path.append((start, line, flow, order, type))
+            self.path.append((start, line, flow, order, type, scope))
 
         counter = 1
         key_ind = encrypt(start,str(counter))
@@ -42,6 +42,7 @@ class VulnerabilityDetector(object):
             currFlow = val_ind.get_flow()
             currOrder = val_ind.get_order()
             currType = val_ind.get_type()
+            currScope = val_ind.get_scope()
             currToken = val_ind.get_det_key()
             currRndKey = val_ind.get_rnd_key()
 
@@ -50,9 +51,9 @@ class VulnerabilityDetector(object):
                 if not line:
                     self.path = [None]
                     self.path[0] = (start, currLine, currFlow,
-                                    currOrder, currType)
+                                    currOrder, currType, currScope)
                 self.sse_search(end, currToken.type,currRndKey,
-                            currToken.lineno, currFlow, currOrder, currType)
+                            currToken.lineno, currFlow, currOrder, currType, currScope)
                 self.path.pop()
                 self.visited.remove(currToken)
             counter += 1
@@ -62,9 +63,9 @@ class VulnerabilityDetector(object):
         
 
 
-    def search(self, end, start, line=None, flow=0, order=0, type=0):
+    def search(self, end, start, line=None, flow=0, order=0, type=0, scope=None):
         if line:
-            self.path.append((start, line, flow, order, type))
+            self.path.append((start, line, flow, order, type, scope))
 
         if start == end or start not in self.ds.data:
             self.output.append(copy(self.path))
@@ -77,14 +78,15 @@ class VulnerabilityDetector(object):
             currFlow = v.get_flow()
             currOrder = v.get_order()
             currType = v.get_type()
+            currScope = v.get_scope()
             if v.get_token() not in self.visited:
                 self.visited.append(currToken)
                 if not line:
                     self.path = [None]
                     self.path[0] = (start, currLine, currFlow,
-                                    currOrder, currType)
+                                    currOrder, currType, currScope)
                 self.search(end, currToken.type,
-                            currToken.lineno, currFlow, currOrder, currType)
+                            currToken.lineno, currFlow, currOrder, currType, currScope)
                 self.path.pop()
                 self.visited.remove(currToken)
 
@@ -109,17 +111,20 @@ class VulnerabilityDetector(object):
 
         for k, v in group_by_vulns.items():
             # remove substitutions after vuln
+            # also remove invalid paths
             to_remove = set()
+            lowest = {} # according to scope
             for i, path in enumerate(v):
-                lowest = path[0][1]
+                lowest[path[0][5]] = path[0][1]
                 for j in path[1:]:
-                    if j[1] > lowest:
+                    #print(j)
+                    if j[5] in lowest and j[1] > lowest[j[5]]:
                         try:
                             to_remove.add(i)
                         except:
                             pass
                     else:
-                        lowest = j[1]
+                        lowest[j[5]] = j[1]
             new_v = []
             for i in range(len(v)):
                 if i not in to_remove:

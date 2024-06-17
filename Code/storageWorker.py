@@ -125,7 +125,11 @@ class Worker(object):
             elif curr.type == "RETURN" and len(self.inFunction) > 0:
                 self.next += 1
                 curr = self.tokenstream[self.next]
-                self.create_entry(self.inFunction[-1], curr, curr.lineno, depth, self.order[depth], self.type)
+                while curr.type != "ENDFUNCBLOCK":
+                    self.create_entry(self.inFunction[-1], curr, curr.lineno, depth, self.order[depth], self.type)
+                    self.next += 1
+                    curr = self.tokenstream[self.next]
+                self.inFunction.pop()
             elif curr.type == "ENDFUNCBLOCK" and len(self.inFunction) > 0:
                 self.inFunction.pop()
             elif curr.type == "ELSEIF" or curr.type == "CASE":
@@ -164,7 +168,6 @@ class Worker(object):
         self.store(depth)
 
     def handle_func_call(self, curr, depth, assign=None):
-        self.inFunction.append(curr)
         funcname = curr.type
 
         if funcname not in self.funcCalls:
@@ -200,7 +203,9 @@ class Worker(object):
             curr = self.tokenstream[self.next]
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
-    def create_entry(self, key_ind, val_ind, lineno, depth, order, type):
+    def create_entry(self, key_ind, val_ind, lineno, depth, order, type, scope="GLOBAL"):
+        if len(self.inFunction) > 0:
+            scope = self.inFunction[-1].type
         #print(key_ind, "-->",val_ind)
         if self.kd_key and self.kr_key:
             val_lineno = val_ind.lineno
@@ -213,16 +218,17 @@ class Worker(object):
             key_detkey = encrypt(self.kd_key, key_ind)
             key_rndkey = encrypt(self.kr_key,key_ind)
             val_detkey = encrypt(self.kd_key, val_ind)
-            
+            #TODO: Consider security, for now use a different key so that they can't infer that the token and the scope are different
+            scope = encrypt(self.kd_key+self.kr_key, scope) 
             
             val_rndkey = encrypt(self.kr_key,val_ind)            
 
-            val_ind = MyEncryptedValue(MyToken(val_detkey,val_lineno), val_rndkey, lineno, depth, order, type, self.ore_params)
+            val_ind = MyEncryptedValue(MyToken(val_detkey,val_lineno), val_rndkey, lineno, depth, order, type, scope, self.ore_params)
             val_ind = AESCipher(key_rndkey).encrypt(val_ind._serialize())
             key_ind = encrypt(key_detkey, str(self.counter[key_ind]))
         else:
             val_ind = MyValue(
-            key_ind.lineno, depth, MyToken(val_ind.type,val_ind.lineno), self.order[depth], self.type)
+            key_ind.lineno, depth, MyToken(val_ind.type,val_ind.lineno), self.order[depth], self.type, scope)
             key_ind = key_ind.type
         
         self.ds.put(key_ind, val_ind)

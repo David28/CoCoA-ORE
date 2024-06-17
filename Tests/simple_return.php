@@ -1,11 +1,18 @@
 <?php
 
-function myVuln() {
-  $a = $_GET['a'];
+$a = $_GET['a'];
+
+function myTaint($a) {
+  return $a;
+} 
+
+
+function myVuln($a) {
+  echo $a;
   return $a;
 }
 
-$b = myVuln();
+$b = myVuln(myTaint($a));
 echo $b;
 
 ?>
