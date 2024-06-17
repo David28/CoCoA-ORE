@@ -1,5 +1,6 @@
 <?php
 
+
 function myVuln() {
     $a = $_GET['a'];
     return $a;

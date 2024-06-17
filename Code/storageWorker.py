@@ -71,8 +71,6 @@ class Worker(object):
                 while curr.type != "END_ASSIGN" :
                     if _isFunc(curr.type):
                         self.handle_func_call(curr, depth, key)
-                        curr = self.tokenstream[self.next]
-                        continue
                     if _isSens(curr.type) or _isSans(curr.type):
                         self.next += 1
                         dummie = self.tokenstream[self.next]
@@ -96,7 +94,7 @@ class Worker(object):
                         self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
                     self.next += 1
                     curr = self.tokenstream[self.next]
-            elif curr.type == "BEGINFUNCDEF": #handle function definition 
+            elif curr.type == "BEGINFUNCDEF": #handle function definition
                 self.next += 1
                 curr = self.tokenstream[self.next]
                 func = curr
@@ -111,7 +109,6 @@ class Worker(object):
                             "assigns": [] #keep track of vars that are assigned to the return value of the function
                         }
                     self.funcCalls[funcname]["args"].append(curr)
-                    #print("FuncCalls: ", self.funcCalls)
                     self.next += 1
                     curr = self.tokenstream[self.next]
                 self.inFunction.append(func)
@@ -169,6 +166,7 @@ class Worker(object):
     def handle_func_call(self, curr, depth, assign=None):
         self.inFunction.append(curr)
         funcname = curr.type
+
         if funcname not in self.funcCalls:
             self.funcCalls[funcname] = {
                         "args": [],
@@ -200,7 +198,6 @@ class Worker(object):
                 continue
             self.next += 1 
             curr = self.tokenstream[self.next]
-        self.next += 1
 
     #(DET(D_Var2, 2) , RND(R_Var2, {D_Var1, R_Var1 , 4, 0,0,0})
     def create_entry(self, key_ind, val_ind, lineno, depth, order, type):
