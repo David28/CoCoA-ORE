@@ -54,7 +54,6 @@ class Worker(object):
 
     def store(self, depth):
         if self.next >= len(self.tokenstream):
-            #print("FUNCALLS: ", self.funcCalls)
             #if there are functions defined elsewhere we create entries of the assign to all the calls
             for func in self.funcCalls:
                 for assign in self.funcCalls[func]["assigns"]:
@@ -126,7 +125,16 @@ class Worker(object):
                 self.next += 1
                 curr = self.tokenstream[self.next]
                 while curr.type != "ENDFUNCBLOCK":
-                    self.create_entry(self.inFunction[-1], curr, curr.lineno, depth, self.order[depth], self.type)
+                    if _isFunc(curr.type):
+                        self.handle_func_call(curr, depth, key)
+                    if _isSens(curr.type) or _isSans(curr.type):
+                        self.next += 1
+                        dummie = self.tokenstream[self.next]
+                        while dummie.type != "END_CALL":
+                            self.next += 1
+                            dummie = self.tokenstream[self.next]
+                    if not _isOP(curr.type) and curr.type != "END_ASSIGN" and curr.type != "END_CALL":
+                        self.create_entry(self.inFunction[-1],curr, self.inFunction[-1].lineno, depth, self.order[depth], self.type)
                     self.next += 1
                     curr = self.tokenstream[self.next]
                 self.inFunction.pop()
@@ -218,8 +226,9 @@ class Worker(object):
             key_detkey = encrypt(self.kd_key, key_ind)
             key_rndkey = encrypt(self.kr_key,key_ind)
             val_detkey = encrypt(self.kd_key, val_ind)
-            #TODO: Consider security, for now use a different key so that they can't infer that the token and the scope are different
-            scope = encrypt(self.kd_key+self.kr_key, scope) 
+            
+            #hide scope (function token)
+            scope = encrypt(self.kd_key) 
             
             val_rndkey = encrypt(self.kr_key,val_ind)            
 

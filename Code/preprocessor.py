@@ -4,23 +4,20 @@ import sys
 # so that they can be recognized by cocoa as sanitization functions
 cast_pattern = re.compile(r'\(\s*(int|float|string|bool)\s*\)')
 php_tag_pattern = re.compile(r'((?:<\?php)|(?:<\?PHP)|(?:<\?=))(.*?)($|(?:\?>))')
-php_end_tag_pattern = re.compile(r'()(.*?)(?:$|(\?>))')
+php_end_tag_pattern = re.compile(r'()(.*?)(?:$|(\?>))') #empty group so that it can be used in the same way as php_tag_pattern
 class Preprocessor:
     def __init__(self):
-        self.offset = {}
-
+        self.offset = []
 
 
     def preprocess_php(self, input_data):
         #replace all non php code with blanks
         in_php = False
         result = "<?php\n"
-        self.offset = {1:0}
         current_line = 1
-        current_offset = 1
+        self.offset.append(current_line)
         for line in input_data.split("\n"):
             current_line += 1
-            self.offset[current_line] = current_line - current_offset
             output = line
             #find all matches
             matches = php_tag_pattern.findall(line)
@@ -42,9 +39,8 @@ class Preprocessor:
                 new_line += code
                 if add_new_line:
                     current_line += 1
-                    current_offset += 1
                     new_line += "\n"
-                    self.offset[current_line] = current_line - current_offset
+                    self.offset.append(current_line)
                 if match[2] == "?>":
                     in_php = False
                 else:
@@ -59,8 +55,11 @@ class Preprocessor:
         return result + "?>"
 
     def get_original_line(self, line):
-        return self.offset[line]
-
+        result = line
+        for offseted_line in self.offset:
+            if line >= offseted_line:
+                result -= 1
+        return result
 var_pattern = r'(?:(?:\$\w+)|(?:[\",\']\w+[\",\'])|(?:\w+\(.+\)))'
 
 #turn this (int) 5; into intval(5);

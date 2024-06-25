@@ -97,7 +97,7 @@ class VulnerabilityDetector(object):
             self.search(start, end)
         # operations over output
         #for x in self.output:
-        #    print(x)
+            #print(x)
         final = {}
         group_by_vulns = {}
         myresult = []

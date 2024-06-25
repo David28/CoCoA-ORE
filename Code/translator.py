@@ -95,7 +95,7 @@ class Translator(object):
             elif tok.type == "VAR" and lextokens[i+1].type == "POINTER":
                 tok.value = tok.value + "." + lextokens[i+2].value
                 del lextokens[i+1]
-                del lextokens[i+1]
+                #del lextokens[i+1]
                 continue
 
             elif tok.type == "VAR":
@@ -116,7 +116,6 @@ class Translator(object):
                 
                 # append token to indicate a function definition
                 mytokens.append(MyToken("BEGINFUNCDEF", tok.lineno))
-
                 mytokens.append(
                     MyToken("FUNC"+str(func.index(funcname.value)), funcname.lineno))
                 del lextokens[i+1]
@@ -215,6 +214,9 @@ class Translator(object):
                         func.append(tok.value)
                     mytokens.append(
                         MyToken("FUNC"+str(func.index(tok.value)), tok.lineno))
+                elif tok.value == "new":
+                    #TODO: CLASS HANDLING
+                    i += 1
                 else: #assume it's a constant
                     mytokens.append(
                         MyToken("CONST", tok.lineno))
