@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import re
 
 run_count = 5 #number of times to run each file
-master_dir = "../Tests/WebAppsComplete/"
+master_dir = "../Tests/WebApps/"
 
 def test_file(file_info,flags, timeout=5):
     # Unpack file_info

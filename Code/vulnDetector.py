@@ -90,7 +90,7 @@ class VulnerabilityDetector(object):
                 self.path.pop()
                 self.visited.remove(currToken)
 
-    def detection(self,start, end, sans, init_rnd_key = None):
+    def detection(self,start, end, sans, common_sans, init_rnd_key = None):
         if init_rnd_key:
             self.sse_search( start,end, init_rnd_key)
         else:
@@ -230,7 +230,7 @@ class VulnerabilityDetector(object):
         i = 0
         while i < len(myresult):
             for j in myresult[i]:
-                if j[0] == sans:
+                if j[0] == sans or j[0] == common_sans:
                     vuln = myresult[i][0]
                     if j[2] == vuln[2] and j[3] == vuln[3] and j[4] == vuln[4]:
                         remall.append(myresult[i][0])

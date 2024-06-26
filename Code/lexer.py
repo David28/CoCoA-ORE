@@ -25,7 +25,7 @@ keywords = {
     'while': 'WHILE',
     'for': 'FOR',
     # 'do': 'DO',
-    # 'foreach': 'FOREACH',
+    'foreach': 'FOREACH',
     'continue': 'CONTINUE',
     # Misc
     'return': 'RETURN',
@@ -64,7 +64,7 @@ tokens = list(keywords.values()) + [
     # Input Functions
     'INPUT'
 
-] + [i['name']+'_SENS' for i in config['VULNS']] + [i['name']+'_SANS' for i in config['VULNS']]
+] + [i['name']+'_SENS' for i in config['VULNS']] + [i['name']+'_SANS' for i in config['VULNS']] + ['_SANS']
 
 t_POINTER = r'->'
 # Operators
@@ -151,11 +151,16 @@ def t_VAR(t):
         t.type = 'INPUT'
         return t
 
+    if t.value in config['SANS']:
+        t.type = '_SANS'
+        return t
+
     for vuln in config['VULNS']:
         if t.value in vuln['sensitive_sinks']:
             t.type = vuln['name']+'_SENS'
             return t
         elif t.value in vuln['sanitization_functions']:
+            # if vuln sans is defined for all vulns then give just SANS 
             t.type = vuln['name']+'_SANS'
             return t
     if t.value == 'NULL' or t.value == 'null':

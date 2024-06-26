@@ -99,12 +99,13 @@ if __name__ == '__main__':
     # --- Vulnerability Detection ---
     start_time = time.perf_counter()
     vd = VulnerabilityDetector(data, Kd_key)
+    common_sans = '_SANS'
     print(input,sens)
     if (flag):
         rnd_key = encrypt(Kr_key, sens)
-        results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), rnd_key)
+        results = vd.detection(encrypt(Kd_key,input),encrypt(Kd_key,sens), encrypt(Kd_key,sans), encrypt(Kd_key, common_sans), rnd_key)
     else:
-        results = vd.detection(input, sens, sans)
+        results = vd.detection(input, sens, sans, common_sans)
     end_time = time.perf_counter()
     print("---VD %s seconds ---" % (end_time - start_time))
     for i in results:

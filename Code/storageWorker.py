@@ -228,7 +228,7 @@ class Worker(object):
             val_detkey = encrypt(self.kd_key, val_ind)
             
             #hide scope (function token)
-            scope = encrypt(self.kd_key) 
+            scope = encrypt(self.kd_key, scope) 
             
             val_rndkey = encrypt(self.kr_key,val_ind)            
 

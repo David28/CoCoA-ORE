@@ -188,6 +188,10 @@ class Translator(object):
                 cond = 1
                 mytokens.append(MyToken("FOR", tok.lineno))
                 mytokens.append(MyToken("COND", tok.lineno))
+            elif tok.type == "FOREACH":
+                bracecount.append("ENDFOREACH")
+                cond = 1
+                mytokens.append(MyToken("FOREACH", tok.lineno))
             elif tok.type == "SWITCH":
                 bracecount.append("ENDSWITCH")
                 cond = 1

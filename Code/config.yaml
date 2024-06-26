@@ -13,6 +13,13 @@ INPUT:
     "$http_response_header",
   ]
 
+#Sanitization functions for both XSS and SQLi
+SANS:
+  [
+    "intval",
+    "floatval",
+  ]
+
 #Vulnerabilities
 VULNS:
   [
@@ -27,8 +34,6 @@ VULNS:
           "strip_tags",
           "urlencode",
           "rawurlencode",
-          "intval",
-          "floatval",
         ],
     },
 
@@ -54,10 +59,7 @@ VULNS:
           "mysqli_real_escape_string",
           "mysqli_stmt_bind_param",
           "md5",
-
-          # If looking for XSS vulnerabilities, comment out the following lines and uncomment the ones above and vice versa
-          #"intval",
-          #"floatval",
         ]
     },
+
   ]
