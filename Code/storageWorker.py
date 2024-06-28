@@ -74,7 +74,7 @@ class Worker(object):
                         self.next += 1
                         dummie = self.tokenstream[self.next]
                         while dummie.type != "END_CALL":
-                            if not _isOP(curr.type):
+                            if not _isOP(dummie.type) and dummie.type != "NEXT_ARG":
                                 self.create_entry(curr, dummie, curr.lineno, depth, self.order[depth], self.type)
                             self.next += 1
                             dummie = self.tokenstream[self.next]
@@ -89,7 +89,7 @@ class Worker(object):
                 self.next += 1
                 curr = self.tokenstream[self.next]
                 while curr.type != "END_CALL":
-                    if not _isOP(curr.type):
+                    if not _isOP(curr.type) and curr.type != "NEXT_ARG":
                         self.create_entry(key,curr, key.lineno, depth, self.order[depth], self.type)
                     self.next += 1
                     curr = self.tokenstream[self.next]
