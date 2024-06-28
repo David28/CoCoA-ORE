@@ -60,7 +60,10 @@ if __name__ == "__main__":
                     total_sqli_vuln += output[1].count('*') if classification == "true" else 0 
                 else:
                     total_xss_vuln += output[1].count('*') if classification == "true" else 0
-            result += [classification, output[1]]
+            # catch all lines that start with * 
+            vuln_paths = output[1].split("Vulnerabilitys' path:")
+            output = "" if len(vuln_paths) == 1 else vuln_paths[1]
+            result += [classification, output]
 
         rows.append(result)
         print(f"Tested file {count}/{len(php_files)}: {file[0]}", end="\r")
@@ -80,7 +83,10 @@ if __name__ == "__main__":
     #dont use cientific notation
     # write as csv for each webapp
     for key in grouped:
-        with open(f"../{key}.csv", "w") as f:
+        #make results folder 
+        if not os.path.exists(f"{master_dir}.results/"):
+            os.makedirs(f"{master_dir}.results/")
+        with open(f"{master_dir}.results/{key}.csv", "w") as f:
             writer = csv.writer(f)
             writer.writerows([["File", "XSS Vuln", "Output", "SQLi Vuln", "Output"]])
             writer.writerows(grouped[key])
