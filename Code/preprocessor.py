@@ -2,7 +2,6 @@ import re
 import sys
 #Extract php snippets only from the code and convert explicit casts to functions
 # so that they can be recognized by cocoa as sanitization functions
-cast_pattern = re.compile(r'\(\s*(int|float|string|bool)\s*\)')
 php_tag_pattern = re.compile(r'((?:<\?php)|(?:<\?PHP)|(?:<\?=))(.*?)($|(?:\?>))')
 php_end_tag_pattern = re.compile(r'()(.*?)(?:$|(\?>))') #empty group so that it can be used in the same way as php_tag_pattern
 class Preprocessor:
@@ -13,10 +12,15 @@ class Preprocessor:
     def preprocess_php(self, input_data):
         #replace all non php code with blanks
         in_php = False
-        result = "<?php\n"
-        current_line = 1
-        self.offset.append(current_line)
-        for line in input_data.split("\n"):
+        lines = input_data.split("\n")
+        if not lines[0].startswith("<?php"):
+            result = "<?php\n"
+            current_line = 1
+            self.offset.append(current_line)
+        else:
+            result = "<?php"
+            current_line = 0
+        for line in lines:
             current_line += 1
             output = line
             #find all matches
@@ -34,7 +38,7 @@ class Preprocessor:
                 if match[0] == "<?=":
                     code = "echo "+code + ";"
                     add_new_line = True
-                if re.compile(r'\$\w+\s*').match(code):
+                if re.compile(r'\s*\$\w+\s*').match(code):
                     code = preprocess_casts(code)
                 new_line += code
                 if add_new_line:
@@ -47,7 +51,7 @@ class Preprocessor:
                     in_php = True
             if len(matches) == 0 and in_php:
                 code = line 
-                if re.compile(r'\$\w+\s*').match(code):
+                if re.compile(r'\s*\$\w+\s*').match(code):
                     code = preprocess_casts(code)
                 new_line += code
             output = new_line
@@ -69,16 +73,15 @@ def convert_explicit_cast_to_function(php_code):
 
     if not re.compile(pattern).search(php_code):
         return php_code
-    cast_pattern = r'\(\s*(int|float|string|bool)\s*\)'
-    match = re.compile(pattern).search(php_code)
-    new_code = re.compile(cast_pattern).sub("", match.group(0))
-    cast = re.compile(cast_pattern).search(php_code).group(0)
-    cast = cast.replace("(", "")
-    cast = cast.replace(")", "")
-    new_code = cast+"val("+new_code+")"
-    new_code = new_code.replace(";", "")
-    new_code += " ;"
-    php_code = php_code.replace(match.group(0), new_code)
+    cast_pattern = re.compile(r'\(\s*(int|float|string|bool)\s*\)\s*([^\s;,\)]+)')
+
+    def replace_cast(match):
+        cast_type = match.group(1)
+        expression = match.group(2)
+        return f'{cast_type}val({expression})'
+
+    # Replace all occurrences of the explicit cast pattern
+    php_code = cast_pattern.sub(replace_cast, php_code)
     return php_code
     
 #turn $a += 0; into $a = $a +0; 
@@ -101,7 +104,6 @@ def convert_sum_cast_to_function(php_code):
     match = re.compile(whole_pattern).search(php_code)
     new_code = php_code
     if match:
-        #print(match)
         #get full match 
         #find int or float
         digit = re.compile(r'(\d+(\.\d+)?)').search(php_code).group(1)
@@ -140,6 +142,10 @@ if __name__ == "__main__":
     test_Case = "$a = $b + (int) 5 +1;"
     print(preprocess_casts(test_Case))
     test_Case = "$a = 0 + $b + (int) 5 +1;"
+    print(preprocess_casts(test_Case))
+    test_Case = "funcion((int) $_GET['a'] + 1);"
+    print(preprocess_casts(test_Case))
+    test_Case = "$picquery = mysql_query(\"SELECT * FROM picdata WHERE ID = \".(int)$_GET['pic_id'], $conx);"
     print(preprocess_casts(test_Case))
    
     
