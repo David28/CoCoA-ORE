@@ -10,7 +10,7 @@ import re
 
 run_count = 5 #number of times to run each file
 master_dir = "../Tests/WebApps/"
-info = [("../performance.csv", ["-p"]), ("../performance_e.csv", ["-e", "-p"]), ("../performance_o.csv", ["-o", "-p"])]
+info = [("performance.csv", ["-p"]), ("performance_e.csv", ["-e", "-p"]), ("performance_o.csv", ["-o", "-p"])]
 
 
 def test_file(file_info,flags, timeout=5):
@@ -53,7 +53,11 @@ def extract_performace_values(output):
     
     return preprocessor_time,lexer_time, translator_time, encryptor_time, vd_time, filesize
 if __name__ == "__main__":
-
+    if "-s" in sys.argv or "--sqli" in sys.argv:
+        new_info = []
+        for output, flags in info:
+            new_info.append((output.replace(".csv","_sqli.csv") , flags + ["-s"]))
+        info = new_info
     php_files = []
     for path, subdires, files in os.walk(master_dir):
         #if "zipec" not in path:
@@ -65,7 +69,6 @@ if __name__ == "__main__":
     
     for output, flags in info:    
         #clear caches
-        os.system("sync; echo 3 > /proc/sys/vm/drop_caches")
         rows = []
         rows = [["WebApp","Preprocessor Time (ms)", "Lexer Time (ms)", "Translator Time (ms)", "Encryptor Time (ms)", "VD Time (ms)", "Encrypted Index Size (bytes)", "Success Files Count", "Disk Space", "LOC"]]
         print("Testing files in: ", master_dir + " with flags: " + " ".join(flags))
@@ -120,7 +123,9 @@ if __name__ == "__main__":
         rows = rows[0:1]
         for key in sorted(grouped.keys(), key=lambda x: x.lower()):
             rows.append([key] + grouped[key])
-        with open(output, 'w', newline='') as file:
+        if not os.path.exists(master_dir+"/.performance"):
+            os.makedirs(master_dir+"/.performance")
+        with open(master_dir+"/.performance/"+output, 'w', newline='') as file:
             writer = csv.writer(file, delimiter='\t')
             writer.writerows(rows)
         print("Total files found: " + str(count))
