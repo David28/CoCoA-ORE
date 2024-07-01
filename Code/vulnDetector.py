@@ -164,7 +164,7 @@ class VulnerabilityDetector(object):
             for k,path_set in groups.items():
                 best_match = None
                 discarted = set()
-                for i in range(1, min(len(x) for x in path_set)):
+                for i in range(1, max(len(x) for x in path_set)):
                     closest = None, None
                     for j in range(0, len(path_set)):
                         if j in discarted: continue
@@ -172,7 +172,7 @@ class VulnerabilityDetector(object):
                             if not closest[0]:
                                 closest = path_set[j][i], j
                                 best_match = path_set[j]
-                            elif path_set[j][i][1] > closest[0][1]:
+                            elif path_set[j][i][1] > closest[0][1] or (path_set[j][i][1] == closest[0][1] and path_set[j][i][0] == start):
                                 discarted.add(closest[1])
                                 closest = path_set[j][i], j
                                 best_match = path_set[j]

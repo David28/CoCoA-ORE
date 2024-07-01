@@ -32,6 +32,9 @@ def test_file(file_info,flags, timeout=5):
 
 
 if __name__ == "__main__":
+    #if dir is passed as argument
+    if len(sys.argv) > 1:
+        master_dir = sys.argv[1]
 
     php_files = []
     for path, subdires, files in os.walk(master_dir):
